@@ -19,7 +19,7 @@ namespace repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=../dash.db;").EnableSensitiveDataLogging();
+            optionsBuilder.UseNpgsql("Host=localhost:5432;Database=ericoloewe;Username=postgres;Password=").EnableSensitiveDataLogging();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

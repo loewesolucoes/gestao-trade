@@ -1,30 +1,86 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using console;
 using domain;
+using Newtonsoft.Json;
 using repository;
 
 Console.WriteLine("Hello, World!");
 
 new Intraday();
 
-using var context = new DashContext();
-
-context.Stocks.Add(new Stock()
-{
-    Active = true,
-    Code = "AZUL4",
-    Name = "Azul"
-});
-
-context.SaveChanges();
+Teste1().Wait();
 
 //Teste().Wait();
 
 
+async Task Teste1()
+{
+    var client = new HttpClient();
+    var request = new HttpRequestMessage(HttpMethod.Get, "https://brapi.dev/api/quote/list");
+    request.Headers.Add("Authorization", "Bearer 6NK6Do7rQJwwNeYx5V16h1");
+    var response = await client.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+
+    if (response.Content is object && response.Content.Headers?.ContentType?.MediaType == "application/json")
+    {
+        var contentStream = await response.Content.ReadAsStreamAsync();
+
+        using var streamReader = new StreamReader(contentStream);
+        using var jsonReader = new JsonTextReader(streamReader);
+
+        JsonSerializer serializer = new JsonSerializer();
+
+        try
+        {
+            var brapiresponse = serializer.Deserialize<BrapiResponse>(jsonReader);
+
+
+            var stocks = brapiresponse.Stocks.Select(x => new Stock()
+            {
+                Active = true,
+                Code = x.StockStock,
+                MarketCap = x.MarketCap,
+                Logo = x.Logo,
+                Name = x.Name,
+                Type = x.Sector != null ? StockType.COMPANY : StockType.OTHERS,
+                Sector = x.Sector,
+            });
+
+            using var context = new DashContext();
+
+            context.Stocks.AddRange(stocks);
+            context.SaveChanges();
+        }
+        catch (JsonReaderException)
+        {
+            Console.WriteLine("Invalid JSON.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("HTTP Response was invalid and cannot be deserialised.");
+    }
+}
+
 async Task Teste()
 {
+    using var context = new DashContext();
+
     var result = await DownloadHistoricalDataAsync("AZUL4.SA", DateTime.Parse("2017-01-02"), DateTime.Parse("2023-09-27"));
 
+    result.Select(x => new Intraday()
+    {
+        Close = x.Close,
+        Max = x.High,
+        Min = x.Low,
+        Open = x.Open,
+        StockId = "AZUL4",
+        Date = x.Date,
+    });
+
     Console.WriteLine(result);
+
+    context.SaveChanges();
 }
 
 async Task<HistoricalDataRecord[]?> DownloadHistoricalDataAsync(string StockSymbol, DateTime PeriodStart, DateTime PeriodEnd, int try_count = 10)
@@ -129,11 +185,11 @@ async Task<HistoricalDataRecord[]> TryGetHistoricalDatAsync(string symbol, DateT
                 string[] cols = thisrow.Split(Splitter.ToArray(), StringSplitOptions.None);
 
                 rec.Date = DateTime.Parse(cols[0]);
-                rec.Open = System.Convert.ToSingle(cols[1]);
-                rec.High = System.Convert.ToSingle(cols[2]);
-                rec.Low = System.Convert.ToSingle(cols[3]);
-                rec.Close = System.Convert.ToSingle(cols[4]);
-                rec.AdjustedClose = System.Convert.ToSingle(cols[5]);
+                rec.Open = System.Convert.ToDecimal(cols[1]);
+                rec.High = System.Convert.ToDecimal(cols[2]);
+                rec.Low = System.Convert.ToDecimal(cols[3]);
+                rec.Close = System.Convert.ToDecimal(cols[4]);
+                rec.AdjustedClose = System.Convert.ToDecimal(cols[5]);
                 rec.Volume = System.Convert.ToInt32(cols[6]);
 
                 datarecs.Add(rec);
@@ -162,15 +218,15 @@ public class HistoricalDataRecord
 {
     public DateTime Date { get; set; }
 
-    public float Open { get; set; }
+    public decimal Open { get; set; }
 
-    public float High { get; set; }
+    public decimal High { get; set; }
 
-    public float Low { get; set; }
+    public decimal Low { get; set; }
 
-    public float Close { get; set; }
+    public decimal Close { get; set; }
 
-    public float AdjustedClose { get; set; }
+    public decimal AdjustedClose { get; set; }
 
     public int Volume { get; set; }
 }
