@@ -13,12 +13,17 @@ namespace repository.Repositories
             _context = context;
         }
 
-        public bool IsUpdated(string stockId, Interval interval)
+        public void DeleteHistoryByUpdate(StockUpdate stockUpdate)
         {
-            return _context.StockUpdates.Any(x => x.StockId == stockId
-                && x.Interval == interval
-                && x.CreatedAt >= DateTime.Today
-            );
+            var historyToDelete = _context.History.Where(x => x.StockId == stockUpdate.StockId && x.Interval == stockUpdate.Interval && x.Date >= stockUpdate.CreatedAt).ToList();
+
+            _context.History.RemoveRange(historyToDelete);
+            _context.SaveChanges();
+        }
+
+        public StockUpdate? GetLastUpdate(string stockId, Interval interval)
+        {
+            return _context.StockUpdates.OrderBy(x => x.CreatedAt).LastOrDefault(x => x.StockId == stockId && x.Interval == interval);
         }
 
         public void SaveHistory(string stockId, Interval interval, IEnumerable<Intraday> intradays)
@@ -31,6 +36,21 @@ namespace repository.Repositories
             });
 
             _context.SaveChanges();
+
+            //var keys = _context.History
+            //    .GroupBy(s => new { s.Date, s.StockId, s.Interval })
+            //    .Select(g => new { g.Key, Count = g.Count() })
+            //    .Where(t => t.Count > 1)
+            //    .Select(t => new { t.Key.Date, t.Key.Id })
+            //    .ToList();
+
+            //var dupesToRemove = _context.History
+            //    .GroupBy(s => new { s.Date, s.StockId, s.Interval })
+            //    .Where(t => t.Count() > 1)
+            //    .ToList();
+
+            //_context.History.RemoveRange(dupesToRemove);
+            //_context.SaveChanges();
         }
     }
 }
