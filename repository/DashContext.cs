@@ -19,6 +19,7 @@ namespace repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             optionsBuilder.UseNpgsql("Host=localhost:5432;Database=ericoloewe;Username=postgres;Password=").EnableSensitiveDataLogging();
         }
 

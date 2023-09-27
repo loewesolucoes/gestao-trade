@@ -1,16 +1,33 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using System;
 using console;
 using domain;
+using domain.Contracts;
+using domain.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using repository;
+using repository.Repositories;
 
 Console.WriteLine("Hello, World!");
 
-new Intraday();
+var serviceCollection = new ServiceCollection();
 
-Teste1().Wait();
+ConfigureServices(serviceCollection);
 
-//Teste().Wait();
+var serviceProvider = serviceCollection.BuildServiceProvider();
+
+Console.WriteLine("Configure services!");
+
+var context = serviceProvider.GetService<DashContext>();
+
+//Teste1().Wait();
+Teste().Wait();
+
+Console.WriteLine("Run!");
+
 
 
 async Task Teste1()
@@ -46,7 +63,7 @@ async Task Teste1()
                 Sector = x.Sector,
             });
 
-            using var context = new DashContext();
+            var context = serviceProvider.GetService<DashContext>();
 
             context.Stocks.AddRange(stocks);
             context.SaveChanges();
@@ -64,52 +81,58 @@ async Task Teste1()
 
 async Task Teste()
 {
-    using var context = new DashContext();
+    var service = serviceProvider.GetService<IStockService>();
 
-    var result = await DownloadHistoricalDataAsync("AZUL4.SA", DateTime.Parse("2017-01-02"), DateTime.Parse("2023-09-27"));
-
-    result.Select(x => new Intraday()
+    if (!service.IsUpdated("AZUL4.SA", Interval.DAILY))
     {
-        Close = x.Close,
-        Max = x.High,
-        Min = x.Low,
-        Open = x.Open,
-        StockId = "AZUL4",
-        Date = x.Date,
-    });
+        //var result = new List<HistoricalDataRecord>() { new HistoricalDataRecord() { Date = DateTime.Now, Close = 1, AdjustedClose = 1, High = 2, Low = .5M, Open = .7M, Volume = 1000 } };
+        var result = await DownloadHistoricalDataAsync("AZUL4.SA", DateTime.Parse("1900-01-01"), DateTime.Parse("2023-09-27"));
 
-    Console.WriteLine(result);
-
-    context.SaveChanges();
+        service.SaveHistory("AZUL4", Interval.DAILY, result.Select(x => new Intraday()
+        {
+            Close = x.Close,
+            Max = x.High,
+            Min = x.Low,
+            Open = x.Open,
+            Volume = x.Volume,
+            AdjustedClose = x.AdjustedClose,
+            Interval = Interval.DAILY,
+            StockId = "AZUL4",
+            Date = x.Date,
+        }));
+    }
 }
 
-async Task<HistoricalDataRecord[]?> DownloadHistoricalDataAsync(string StockSymbol, DateTime PeriodStart, DateTime PeriodEnd, int try_count = 10)
+async Task<HistoricalDataRecord[]?> DownloadHistoricalDataAsync(string StockSymbol, DateTime PeriodStart, DateTime PeriodEnd, long try_count = 3)
 {
     //Set up
     HistoricalDataRecord[] HistoricalData = null;
     HistoricalDataDownloadResult DownloadResult = HistoricalDataDownloadResult.Downloading;
 
-
     //Get try count to use
-    int trycountToUse = 10;
+    long trycountToUse = 10;
     if (try_count > 0)
     {
         trycountToUse = try_count;
     }
 
     //Get the data
-    int HaveTriedCount = 0;
+    long HaveTriedCount = 0;
     while (DownloadResult != HistoricalDataDownloadResult.Successful && HaveTriedCount < try_count && DownloadResult != HistoricalDataDownloadResult.DataDoesNotExistForSpecifiedTimePeriod)
     {
-        HistoricalData = await TryGetHistoricalDatAsync(StockSymbol, PeriodStart, PeriodEnd, DownloadResult);
+        var tuple = await TryGetHistoricalDatAsync(StockSymbol, PeriodStart, PeriodEnd);
+
+        HistoricalData = tuple.Item1;
+        DownloadResult = tuple.Item2;
         HaveTriedCount = HaveTriedCount + 1;
     }
 
     return HistoricalData;
 }
 
-async Task<HistoricalDataRecord[]> TryGetHistoricalDatAsync(string symbol, DateTime start, DateTime end, HistoricalDataDownloadResult downloadResult)
+async Task<Tuple<HistoricalDataRecord[], HistoricalDataDownloadResult>> TryGetHistoricalDatAsync(string symbol, DateTime start, DateTime end)
 {
+    HistoricalDataDownloadResult downloadResult;
     DateTime RequestStart = DateTime.Now;
     HistoricalDataRecord[] HistoricalData = null;
 
@@ -162,7 +185,7 @@ async Task<HistoricalDataRecord[]> TryGetHistoricalDatAsync(string symbol, DateT
             downloadResult = HistoricalDataDownloadResult.OtherFailure;
         }
 
-        return HistoricalData; //Exit
+        return Tuple.Create(HistoricalData, downloadResult); //Exit
     }
 
     //Parse into data records
@@ -170,7 +193,7 @@ async Task<HistoricalDataRecord[]> TryGetHistoricalDatAsync(string symbol, DateT
     List<string> Splitter = new List<string>();
     Splitter.Add("\n");
     string[] rows = resptext.Split(Splitter.ToArray(), StringSplitOptions.None);
-    int t = 0;
+    long t = 0;
     for (t = 1; t <= rows.Length - 1; t++)
     {
         string thisrow = rows[t];
@@ -190,7 +213,7 @@ async Task<HistoricalDataRecord[]> TryGetHistoricalDatAsync(string symbol, DateT
                 rec.Low = System.Convert.ToDecimal(cols[3]);
                 rec.Close = System.Convert.ToDecimal(cols[4]);
                 rec.AdjustedClose = System.Convert.ToDecimal(cols[5]);
-                rec.Volume = System.Convert.ToInt32(cols[6]);
+                rec.Volume = System.Convert.ToDecimal(cols[6]);
 
                 datarecs.Add(rec);
             }
@@ -205,13 +228,22 @@ async Task<HistoricalDataRecord[]> TryGetHistoricalDatAsync(string symbol, DateT
     HistoricalData = datarecs.ToArray();
     downloadResult = HistoricalDataDownloadResult.Successful;
 
-    return HistoricalData;
+    return Tuple.Create(HistoricalData, downloadResult);
 }
 
-static int GetUnixTime(DateTime timestamp)
+void ConfigureServices(IServiceCollection services)
+{
+    services
+        .AddDbContext<DashContext>()
+        .AddScoped<IStockRepository, StockRepository>()
+        .AddScoped<IStockService, StockService>()
+        ;
+}
+
+static long GetUnixTime(DateTime timestamp)
 {
     DateTime dateTime = DateTime.Parse("1/1/1970");
-    return Convert.ToInt32((timestamp - dateTime).TotalSeconds);
+    return Convert.ToInt64((timestamp - dateTime).TotalSeconds);
 }
 
 public class HistoricalDataRecord
@@ -228,7 +260,7 @@ public class HistoricalDataRecord
 
     public decimal AdjustedClose { get; set; }
 
-    public int Volume { get; set; }
+    public decimal Volume { get; set; }
 }
 
 public enum HistoricalDataDownloadResult
