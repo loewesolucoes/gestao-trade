@@ -36,7 +36,7 @@ async Task RunAsync()
 {
     var yahooService = serviceProvider.GetService<IYahooFinanceService>();
 
-    var stocks = new string[] { "AZUL4", "PETR4", "BBAS3", "BRSR6", "GGBR4", "MGLU3", "SANB11" };
+    var stocks = new string[] { "AZUL4", "PETR4", "PETR3", "BBAS3", "BRSR6", "GGBR4", "MGLU3", "SANB11", "WEGE3", "ABEV3", "ITUB3", "ITSA3", "VALE3" };
 
     foreach (var item in stocks)
     {
