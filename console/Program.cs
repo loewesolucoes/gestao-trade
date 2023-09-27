@@ -35,7 +35,17 @@ Console.WriteLine("Ok!");
 async Task RunAsync()
 {
     var yahooService = serviceProvider.GetService<IYahooFinanceService>();
-    await yahooService.DowloadAndSaveStock("AZUL4", Interval.DAILY);
+
+    var stocks = new string[] { "AZUL4", "PETR4", "BBAS3", "BRSR6", "GGBR4", "MGLU3", "SANB11" };
+
+    foreach (var item in stocks)
+    {
+        Console.WriteLine($"{item} Starting");
+        await yahooService.DowloadAndSaveStock(item, Interval.DAILY);
+
+        Console.WriteLine($"{item} OK");
+        await Task.Delay(5000);
+    }
 }
 
 void ConfigureServices(IServiceCollection services)

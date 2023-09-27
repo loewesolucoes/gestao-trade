@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using domain.Contracts;
 
 namespace domain.Services
@@ -69,30 +70,17 @@ namespace domain.Services
             YahooHistoricalDataRecord[]? historicalData = null;
 
             //Get the crumb!
-            HttpClient hc = new HttpClient();
-            HttpResponseMessage rm = await hc.GetAsync("https://finance.yahoo.com/quote/" + symbol);
-            string web = await rm.Content.ReadAsStringAsync();
-            //NEED TO HAVE A BETTER WAY TO VERIFY STOCK SYMBOL, THIS NO LONGER WORKS. 
-            //COMMENTING OUT SINCE THE CODE TO DOWNLOAD WORKS WITH EXISTING SYMBOLS 
-            //int loc1 = web.IndexOf("crumb\":");
-            //if (loc1 == -1)
-            //{
-            //    throw new Exception("Unable to verify stock '" + symbol + "'.");
-            //}
-            //int loc1 = web.IndexOf("crumb", loc1 + 1);
-            //loc1 = web.IndexOf(":", loc1 + 1);
-            //loc1 = web.IndexOf("\"", loc1 + 1);
-            //int loc2 = web.IndexOf("\"", loc1 + 1);
-            //string crumb = web.Substring(loc1 + 1, loc2 - loc1 - 1);
+            var hc = new HttpClient();
 
             //Get the unix times
-            string Unix1 = GetUnixTime(start).ToString();
-            string Unix2 = GetUnixTime(end).ToString();
+            var Unix1 = GetUnixTime(start).ToString();
+            var Unix2 = GetUnixTime(end).ToString();
 
             //Get the info
-            string urlfordata = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol + "?period1=" + Unix1 + "&period2=" + Unix2 + "&interval=1d&events=history";
-            HttpResponseMessage fr = await hc.GetAsync(urlfordata);
-            string resptext = await fr.Content.ReadAsStringAsync();
+            var urlfordata = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol + "?period1=" + Unix1 + "&period2=" + Unix2 + "&interval=1d&events=history";
+            var fr = await hc.GetAsync(urlfordata);
+            var stream = await fr.Content.ReadAsStreamAsync();
+            var streamReader = new StreamReader(stream);
 
             //Show the error if one was encountered
             if (fr.StatusCode != System.Net.HttpStatusCode.OK)
@@ -121,23 +109,22 @@ namespace domain.Services
             }
 
             //Parse into data records
-            List<YahooHistoricalDataRecord> datarecs = new List<YahooHistoricalDataRecord>();
-            List<string> Splitter = new List<string>();
-            Splitter.Add("\n");
-            string[] rows = resptext.Split(Splitter.ToArray(), StringSplitOptions.None);
-            long t = 0;
-            for (t = 1; t <= rows.Length - 1; t++)
+            var datarecs = new List<YahooHistoricalDataRecord>();
+
+            _ = streamReader.ReadLine();
+
+            string? line;
+
+            while ((line = streamReader.ReadLine()) != null)
             {
-                string thisrow = rows[t];
-                if (thisrow != "")
+                // Process line
+                if (!string.IsNullOrEmpty(line))
                 {
                     try
                     {
                         YahooHistoricalDataRecord rec = new YahooHistoricalDataRecord();
 
-                        Splitter.Clear();
-                        Splitter.Add(",");
-                        string[] cols = thisrow.Split(Splitter.ToArray(), StringSplitOptions.None);
+                        string[] cols = line.Split(',', StringSplitOptions.None);
 
                         rec.Date = DateTime.Parse(cols[0]);
                         rec.Open = System.Convert.ToDecimal(cols[1]);
@@ -149,9 +136,10 @@ namespace domain.Services
 
                         datarecs.Add(rec);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        throw new Exception("Unable to conver this row: " + thisrow);
+                        Console.WriteLine($"Unable to conver this row ({symbol}): {line}");
+                        Console.WriteLine(ex);
                     }
                 }
             }
@@ -170,7 +158,7 @@ namespace domain.Services
         }
     }
 
-    public class YahooHistoricalDataRecord
+    class YahooHistoricalDataRecord
     {
         public DateTime Date { get; set; }
 
