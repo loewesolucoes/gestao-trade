@@ -4,15 +4,15 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background-start-rgb: 244, 255, 238;
+  --background-end-rgb: 244, 255, 238;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-start-rgb: #f4ffee;
+    --background-end-rgb: #f4ffee;
   }
 }
 
@@ -24,4 +24,10 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+body p.logo {
+  color: #65a147;
+  font-size: large;
+  font-weight: bold;
 }

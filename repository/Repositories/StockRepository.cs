@@ -21,6 +21,11 @@ namespace repository.Repositories
             _context.SaveChanges();
         }
 
+        public ICollection<Stock> GetAll()
+        {
+            return _context.Stocks.OrderBy(x => x.Code).ToList();
+        }
+
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)
         {
             return _context.StockUpdates.OrderBy(x => x.CreatedAt).LastOrDefault(x => x.StockId == stockId && x.Interval == interval);
@@ -36,21 +41,6 @@ namespace repository.Repositories
             });
 
             _context.SaveChanges();
-
-            //var keys = _context.History
-            //    .GroupBy(s => new { s.Date, s.StockId, s.Interval })
-            //    .Select(g => new { g.Key, Count = g.Count() })
-            //    .Where(t => t.Count > 1)
-            //    .Select(t => new { t.Key.Date, t.Key.Id })
-            //    .ToList();
-
-            //var dupesToRemove = _context.History
-            //    .GroupBy(s => new { s.Date, s.StockId, s.Interval })
-            //    .Where(t => t.Count() > 1)
-            //    .ToList();
-
-            //_context.History.RemoveRange(dupesToRemove);
-            //_context.SaveChanges();
         }
     }
 }

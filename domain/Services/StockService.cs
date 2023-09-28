@@ -17,6 +17,11 @@ namespace domain.Services
             _repository.DeleteHistoryByUpdate(stockUpdate);
         }
 
+        public ICollection<Stock> GetAll()
+        {
+            return _repository.GetAll();
+        }
+
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)
         {
             return _repository.GetLastUpdate(stockId, interval);
