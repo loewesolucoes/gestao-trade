@@ -91,7 +91,7 @@ export const PaginationControl = ({
   between = 3,
   total,
   limit,
-  onChangePage = page => console.log(page),
+  onChangePage = page => console.log("Precisa configurar o componente"),
   next = true,
   last = false,
   ellipsis = 0,
@@ -99,9 +99,6 @@ export const PaginationControl = ({
 }: PaginationControlProps) => {
 
   const total_pages = Math.ceil(total / limit)
-
-  console.log(total_pages);
-  
 
   between = between < 1 ? 1 : between
   page = (page < 1 ? 1 : page > total_pages ? total_pages : page)

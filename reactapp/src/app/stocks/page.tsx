@@ -20,6 +20,8 @@ interface Stock {
   sector?: string
 }
 
+const PAGE_PARAM_NAME = "page";
+
 export default function Home() {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [take, setTake] = useState<number>(25);
@@ -30,7 +32,9 @@ export default function Home() {
   const searchParams = useSearchParams()!
 
   useEffect(() => {
-    load();
+    var page = searchParams.get(PAGE_PARAM_NAME)
+
+    page && setPage(Number(page) || 1);
   }, []);
 
   useEffect(() => {
@@ -42,12 +46,14 @@ export default function Home() {
   function setSearchParam() {
     const params = new URLSearchParams(searchParams);
 
-    params.set("page", `${page}`);
+    params.set(PAGE_PARAM_NAME, `${page}`);
 
     router.push(`${pathname}?${params.toString()}`);
   }
 
   async function load() {
+    console.log("HERE");
+    
     const response = await fetch(`https://localhost:7062/Stock?take=${take}&page=${page}`);
     const json = (await response.json()) as StockResponse;
 
