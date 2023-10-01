@@ -55,11 +55,11 @@ function createButton(name: string, defaultValue: any, label = name) {
   return Button;
 }
 
-const First = createButton('First', '«');
-const Prev = createButton('Prev', '‹', 'Previous');
-const Ellipsis = createButton('Ellipsis', '…', 'More');
-const Next = createButton('Next', '›');
-const Last = createButton('Last', '»');
+const First = createButton('First', 'Primeiro');
+const Prev = createButton('Prev', 'Anterior', 'Anterior');
+const Ellipsis = createButton('Ellipsis', '…', 'Mais');
+const Next = createButton('Next', 'Próximo');
+const Last = createButton('Last', 'Ultimo');
 
 const Pagination = React.forwardRef<HTMLUListElement, any>(
   ({ bsPrefix, className, size, ...props }, ref) => {

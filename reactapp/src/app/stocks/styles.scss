@@ -1,6 +1,7 @@
 @import "../bootstrap";
 
 @import "../../../node_modules/bootstrap/scss/pagination";
+@import "../../../node_modules/bootstrap/scss/forms/form-select";
 
 .cards {
   display: grid;
@@ -58,4 +59,12 @@
       }
     }
   }
+}
+
+.pagination-section {
+  display: flex;
+  padding: 20px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
 }

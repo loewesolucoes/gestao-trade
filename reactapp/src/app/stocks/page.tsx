@@ -3,7 +3,7 @@
 import "./styles.scss"
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { PaginationControl } from "../pagination";
+import { PaginationControl } from "../components/pagination";
 
 interface StockResponse {
   success: boolean,
@@ -43,7 +43,6 @@ export default function Home() {
     const params = new URLSearchParams(searchParams);
 
     params.set("page", `${page}`);
-    params.set("take", `${take}`);
 
     router.push(`${pathname}?${params.toString()}`);
   }
@@ -58,7 +57,6 @@ export default function Home() {
 
   return (
     <section className="container">
-      <PaginationControl page={page} total={total} limit={take} ellipsis={10} onChangePage={page => setPage(page)}></PaginationControl>
       <div className="cards">
         {stocks.map(s => (
           <div key={s.code} className="card">
@@ -71,11 +69,14 @@ export default function Home() {
           </div>
         ))}
       </div>
-      <select value={take} onChange={e => setTake(Number(e?.target?.value) || 20)}>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
+      <div className="pagination-section">
+        <PaginationControl page={page} total={total} limit={take} ellipsis={10} onChangePage={page => setPage(page)}></PaginationControl>
+        <select className="form-select" value={take} onChange={e => setTake(Number(e?.target?.value) || 20)}>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
     </section >
   )
 }
