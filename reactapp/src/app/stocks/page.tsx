@@ -1,6 +1,6 @@
 "use client";
 
-import Image from 'next/image'
+import "./styles.scss"
 import { useEffect, useState } from 'react';
 
 interface StockResponse { success: boolean, stocks: Stock[] }
@@ -30,19 +30,23 @@ export default function Home() {
   }
 
   return (
-    <section className="relative flex w-full flex-wrap">
+    <section>
       {stocks.map(s => (
-        <div className="max-w-[250px] rounded overflow-hidden shadow-lg" key={s.code}>
-          <img className="w-full" src={s.logo} alt={s.name} />
-          <div className="px-6 py-4">
-            <div className="font-bold text-xl mb-2">{s.name}</div>
-          </div>
-          <div className="px-6 pt-4 pb-2">
-            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{s.sector}</span>
-            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{s.type}</span>
+        <div key={s.code} className="card">
+          <img src={s.logo} alt={s.name} />
+          <h5>{s.name}</h5>
+          <div className="info">
+            {s.sector && (<span>{s.sector}</span>)}
+            {s.type && (<span>{s.type}</span>)}
           </div>
         </div>
       ))}
-    </section>
+      <select>
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </section >
   )
 }

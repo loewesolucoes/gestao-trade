@@ -27,11 +27,11 @@ export default function RootLayout({
           >
             <Logo />
           </a>
-          <p >
+          <h1>
             Dashboard trader
-          </p>
+          </h1>
         </header>
-        <main >
+        <main>
           {children}
         </main>
       </body>
