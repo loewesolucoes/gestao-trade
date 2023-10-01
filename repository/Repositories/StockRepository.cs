@@ -23,9 +23,12 @@ namespace repository.Repositories
             _context.SaveChanges();
         }
 
-        public StockWithPagingDto GetAll(int page, int take)
+        public StockWithPagingDto GetAll(string search, int page, int take)
         {
-            var query = _context.Stocks.OrderBy(x => !x.Active).ThenBy(x => x.Code);
+            var query = _context.Stocks
+                .Where(x => search == null || x.Code.Contains(search) || x.Name.Contains(search) || (x.Sector != null && x.Sector.Contains(search)))
+                .OrderBy(x => !x.Active)
+                .ThenBy(x => x.Code);
             var stocks = query.Skip(page * take).Take(take).ToList();
             var total = query.Count();
 

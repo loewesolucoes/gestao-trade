@@ -22,13 +22,13 @@ namespace webapi.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(int page = 1, int take = 20)
+        public IActionResult Index(string? search, int page = 1, int take = 20)
         {
             StockWithPagingDto stock;
 
             try
             {
-                stock = _stockService.GetAll(page - 1, take);
+                stock = _stockService.GetAll(search, page - 1, take);
             }
             catch (Exception ex)
             {

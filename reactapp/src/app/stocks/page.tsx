@@ -4,6 +4,7 @@ import "./styles.scss"
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PaginationControl } from "../components/pagination";
+import { TimerUtil } from "../utils/timer";
 
 interface StockResponse {
   success: boolean,
@@ -21,8 +22,12 @@ interface Stock {
 }
 
 const PAGE_PARAM_NAME = "page";
+const SEARCH_PARAM_NAME = "q";
+
+let debounceLoad: any = null;
 
 export default function Home() {
+  const [search, setSearch] = useState<string>('');
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [take, setTake] = useState<number>(25);
   const [page, setPage] = useState<number>(1);
@@ -30,31 +35,39 @@ export default function Home() {
   const [isLoadingMark, setIsLoadingMark] = useState<boolean>(false);
   const [markedStocks, setMarkedStocks] = useState<{ [key: string]: Stock }>({});
   const router = useRouter();
-  const pathname = usePathname()
-  const searchParams = useSearchParams()!
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  debounceLoad = debounceLoad || TimerUtil.debounce((loadAndSet: any) => loadAndSet(), 500);
 
   useEffect(() => {
     var page = searchParams.get(PAGE_PARAM_NAME)
+    var search = searchParams.get(SEARCH_PARAM_NAME)
 
     page && setPage(Number(page) || 1);
+    search && setSearch(search);
   }, []);
 
-  useEffect(() => {
+  useEffect(() => debounceLoad(loadAndSet), [take, page, search]);
+
+  function loadAndSet() {
     setSearchParam();
 
     load();
-  }, [take, page]);
+    console.log(search);
+  }
 
   function setSearchParam() {
     const params = new URLSearchParams(searchParams);
 
     params.set(PAGE_PARAM_NAME, `${page}`);
+    params.set(SEARCH_PARAM_NAME, `${search}`);
 
     router.push(`${pathname}?${params.toString()}`);
   }
 
   async function load() {
-    const response = await fetch(`https://localhost:7062/Stock?take=${take}&page=${page}`);
+    const response = await fetch(`https://localhost:7062/Stock?take=${take}&page=${page}&search=${search}`);
     const json = (await response.json()) as StockResponse;
 
     setMarkedStocks({});
@@ -107,7 +120,7 @@ export default function Home() {
       <div className="mark-section">
         <div className="form-group">
           <label htmlFor="buscaAtivo" className="form-label">Buscar ativo:</label>
-          <input type="search" id="buscaAtivo" name="buscaAtivo" className="form-control" />
+          <input type="search" id="buscaAtivo" name="buscaAtivo" className="form-control" placeholder="PETR4, AZUL4, etc" value={search} onChange={e => setSearch(e?.target?.value)} />
         </div>
         <div className="buttons">
           {Object.keys(markedStocks).length > 0 && (
