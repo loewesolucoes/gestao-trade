@@ -2,6 +2,7 @@
 using domain;
 using domain.Contracts;
 using domain.Dtos;
+using Microsoft.EntityFrameworkCore;
 using repository.Migrations;
 
 namespace repository.Repositories
@@ -26,7 +27,7 @@ namespace repository.Repositories
         public StockWithPagingDto GetAll(string search, int page, int take)
         {
             var query = _context.Stocks
-                .Where(x => search == null || x.Code.Contains(search) || x.Name.Contains(search) || (x.Sector != null && x.Sector.Contains(search)))
+                .Where(x => search == null || EF.Functions.ILike(x.Code, $"%{search}%") || EF.Functions.ILike(x.Name, $"%{search}%") || (x.Sector != null && EF.Functions.ILike(x.Sector, $"%{search}%")))
                 .OrderBy(x => !x.Active)
                 .ThenBy(x => x.Code);
             var stocks = query.Skip(page * take).Take(take).ToList();
