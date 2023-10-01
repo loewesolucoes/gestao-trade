@@ -54,7 +54,6 @@ export default function Home() {
     setSearchParam();
 
     load();
-    console.log(search);
   }
 
   function setSearchParam() {
@@ -102,6 +101,7 @@ export default function Home() {
 
       content = await rawResponse.json();
 
+      await load();
     } catch (ex) {
       console.log("erro ao salvar", ex);
     }
@@ -114,13 +114,18 @@ export default function Home() {
     setIsLoadingMark(false);
   }
 
+  function onChangeSearch(e: any) {
+    setSearch(e?.target?.value);
+    setPage(1);
+  }
+
   return (
     <section className="container">
       {isLoadingMark && (<div className="loading">Carregando...</div>)}
       <div className="mark-section">
         <div className="form-group">
           <label htmlFor="buscaAtivo" className="form-label">Buscar ativo:</label>
-          <input type="search" id="buscaAtivo" name="buscaAtivo" className="form-control" placeholder="PETR4, AZUL4, etc" value={search} onChange={e => setSearch(e?.target?.value)} />
+          <input type="search" id="buscaAtivo" name="buscaAtivo" className="form-control" placeholder="PETR4, AZUL4, etc" value={search} onChange={onChangeSearch} />
         </div>
         <div className="buttons">
           {Object.keys(markedStocks).length > 0 && (
