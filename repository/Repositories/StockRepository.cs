@@ -1,6 +1,7 @@
 ﻿using System;
 using domain;
 using domain.Contracts;
+using domain.Dtos;
 
 namespace repository.Repositories
 {
@@ -21,9 +22,19 @@ namespace repository.Repositories
             _context.SaveChanges();
         }
 
-        public ICollection<Stock> GetAll()
+        public StockWithPagingDto GetAll(int page, int take)
         {
-            return _context.Stocks.OrderBy(x => x.Code).ToList();
+            var query = _context.Stocks.OrderBy(x => x.Code);
+            var stocks = query.Skip(page * take).Take(take).ToList();
+            var total = query.Count();
+
+            return new StockWithPagingDto()
+            {
+                Stocks = stocks,
+                Page = page,
+                Take = take,
+                Total = total,
+            };
         }
 
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)

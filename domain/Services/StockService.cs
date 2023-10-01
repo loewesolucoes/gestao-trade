@@ -1,5 +1,6 @@
 ﻿using System;
 using domain.Contracts;
+using domain.Dtos;
 
 namespace domain.Services
 {
@@ -17,9 +18,9 @@ namespace domain.Services
             _repository.DeleteHistoryByUpdate(stockUpdate);
         }
 
-        public ICollection<Stock> GetAll()
+        public StockWithPagingDto GetAll(int page, int take)
         {
-            return _repository.GetAll();
+            return _repository.GetAll(page, take);
         }
 
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)

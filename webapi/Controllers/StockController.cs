@@ -21,14 +21,14 @@ namespace webapi.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(int page = 1, int take = 20)
         {
-            var stocks = _stockService.GetAll();
+            var stock = _stockService.GetAll(page - 1, take);
 
             return Ok(new
             {
                 success = true,
-                stocks,
+                data= stock,
             });
         }
     }
