@@ -105,12 +105,18 @@ export default function Home() {
     <section className="container">
       {isLoadingMark && (<div className="loading">Carregando...</div>)}
       <div className="mark-section">
-        {Object.keys(markedStocks).length > 0 && (
-          <>
-            <button type="button" className="btn btn-success btn-sm" onClick={() => toogleMark(markedStocks)}>Marcar como ativo(s) / inativo(s)</button>
-            <button type="button" className="btn btn-secondary btn-sm" onClick={() => setMarkedStocks({})}>Limpar seleção</button>
-          </>
-        )}
+        <div className="form-group">
+          <label htmlFor="buscaAtivo" className="form-label">Buscar ativo:</label>
+          <input type="search" id="buscaAtivo" name="buscaAtivo" className="form-control" />
+        </div>
+        <div className="buttons">
+          {Object.keys(markedStocks).length > 0 && (
+            <>
+              <button type="button" className="btn btn-success btn-sm" onClick={() => toogleMark(markedStocks)}>Marcar como ativo(s) / inativo(s)</button>
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setMarkedStocks({})}>Limpar seleção</button>
+            </>
+          )}
+        </div>
       </div>
       <div className="cards">
         {stocks.map(s => (

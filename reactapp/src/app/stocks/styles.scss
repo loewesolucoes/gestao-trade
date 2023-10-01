@@ -20,9 +20,21 @@
 .mark-section {
   display: flex;
   padding: 20px;
-  align-items: flex-start;
-  justify-content: flex-end;
+  align-items: flex-end;
+  justify-content: space-between;
   gap: 20px;
+
+  > .buttons,
+  > .form-group {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    text-wrap: nowrap;
+  }
+
+  @include media-breakpoint-down(md) {
+    flex-direction: column;
+  }
 }
 
 .cards {
@@ -31,8 +43,12 @@
   grid-column-gap: 10px;
   grid-row-gap: 10px;
 
-  @include media-breakpoint-down(lg) {
+  @include media-breakpoint-down(xlg) {
     grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @include media-breakpoint-down(md) {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   @include media-breakpoint-down(sm) {
@@ -50,8 +66,8 @@
     border-radius: 10px;
     padding: 10px;
     background: #fff;
-    opacity: .5;
-    
+    opacity: 0.5;
+
     &.active {
       opacity: 1;
     }
