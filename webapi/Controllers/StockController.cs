@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using domain.Contracts;
+using domain.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace webapi.Controllers
@@ -23,14 +24,43 @@ namespace webapi.Controllers
         [HttpGet]
         public IActionResult Index(int page = 1, int take = 20)
         {
-            var stock = _stockService.GetAll(page - 1, take);
+            StockWithPagingDto stock;
+
+            try
+            {
+                stock = _stockService.GetAll(page - 1, take);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Index");
+                return BadRequest(new { success = false, });
+            }
 
             return Ok(new
             {
                 success = true,
-                data= stock,
+                data = stock,
             });
         }
+
+        [HttpPost("ToggleStockActive")]
+        public IActionResult ToggleStockActive(string[] stockCodes)
+        {
+
+            try
+            {
+                _stockService.ToggleStockActive(stockCodes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ToggleStockActive");
+                return BadRequest(new { success = false, });
+            }
+
+
+            return Ok(new { success = true, });
+        }
+
     }
 }
 

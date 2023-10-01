@@ -27,6 +27,8 @@ export default function Home() {
   const [take, setTake] = useState<number>(25);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(100);
+  const [isLoadingMark, setIsLoadingMark] = useState<boolean>(false);
+  const [markedStocks, setMarkedStocks] = useState<{ [key: string]: Stock }>({});
   const router = useRouter();
   const pathname = usePathname()
   const searchParams = useSearchParams()!
@@ -52,27 +54,75 @@ export default function Home() {
   }
 
   async function load() {
-    console.log("HERE");
-    
     const response = await fetch(`https://localhost:7062/Stock?take=${take}&page=${page}`);
     const json = (await response.json()) as StockResponse;
 
+    setMarkedStocks({});
     setStocks(json.data.stocks);
     setTotal(json.data.total);
   }
 
+  function MarkStock(stock: Stock): void {
+    const newMarkeds = { ...markedStocks };
+
+    if (newMarkeds[stock.code] == null)
+      newMarkeds[stock.code] = stock;
+    else
+      delete newMarkeds[stock.code];
+
+    setMarkedStocks(newMarkeds);
+  }
+
+  async function toogleMark(markedStocks: { [key: string]: Stock; }) {
+    setIsLoadingMark(true);
+
+    let content = {} as any
+
+    try {
+      const codes = Object.values(markedStocks).map(s => s.code);
+
+      const rawResponse = await fetch(`https://localhost:7062/Stock/ToggleStockActive`, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(codes)
+      });
+
+      content = await rawResponse.json();
+
+    } catch (ex) {
+      console.log("erro ao salvar", ex);
+    }
+
+    if (content.success)
+      alert('Salvo com sucesso!')
+    else
+      confirm('Erro ao salvar!')
+
+    setIsLoadingMark(false);
+  }
+
   return (
     <section className="container">
+      {isLoadingMark && (<div className="loading">Carregando...</div>)}
+      <div className="mark-section">
+        {Object.keys(markedStocks).length > 0 && (
+          <>
+            <button type="button" className="btn btn-success btn-sm" onClick={() => toogleMark(markedStocks)}>Marcar como ativo(s) / inativo(s)</button>
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => setMarkedStocks({})}>Limpar seleção</button>
+          </>
+        )}
+      </div>
       <div className="cards">
         {stocks.map(s => (
-          <div key={s.code} className="card">
+          <button key={s.code} type="button" className={`card ${markedStocks[s.code] ? 'marked' : ''} ${s.active ? 'active' : ''}`.trim()} onClick={() => MarkStock(s)}>
             <img src={s.logo} alt={s.name} />
-            <h5>{s.name}</h5>
+            <h4>{s.name}</h4>
+            <small>{s.code}</small>
             <div className="info">
               {s.sector && (<span>{s.sector}</span>)}
               {s.type && (<span>{s.type}</span>)}
             </div>
-          </div>
+          </button>
         ))}
       </div>
       <div className="pagination-section">

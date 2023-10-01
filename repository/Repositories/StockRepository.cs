@@ -2,6 +2,7 @@
 using domain;
 using domain.Contracts;
 using domain.Dtos;
+using repository.Migrations;
 
 namespace repository.Repositories
 {
@@ -24,7 +25,7 @@ namespace repository.Repositories
 
         public StockWithPagingDto GetAll(int page, int take)
         {
-            var query = _context.Stocks.OrderBy(x => x.Code);
+            var query = _context.Stocks.OrderBy(x => !x.Active).ThenBy(x => x.Code);
             var stocks = query.Skip(page * take).Take(take).ToList();
             var total = query.Count();
 
@@ -51,6 +52,17 @@ namespace repository.Repositories
                 Interval = interval,
             });
 
+            _context.SaveChanges();
+        }
+
+        public void ToggleStockActive(string[] stockCodes)
+        {
+            var stocks = _context.Stocks.Where(x => stockCodes.Contains(x.Code)).ToList();
+
+            foreach (var stock in stocks)
+                stock.Active = !stock.Active;
+
+            _context.UpdateRange(stocks);
             _context.SaveChanges();
         }
     }

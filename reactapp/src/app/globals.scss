@@ -1,5 +1,9 @@
 @import "./_bootstrap.scss";
 
+@import "../../node_modules/bootstrap/scss/pagination";
+@import "../../node_modules/bootstrap/scss/forms/form-select";
+@import "../../node_modules/bootstrap/scss/buttons";
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;

@@ -1,7 +1,29 @@
 @import "../bootstrap";
 
-@import "../../../node_modules/bootstrap/scss/pagination";
-@import "../../../node_modules/bootstrap/scss/forms/form-select";
+.loading {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  background: rgba(#000, 0.7);
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  transition: all 300ms;
+}
+
+.mark-section {
+  display: flex;
+  padding: 20px;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 20px;
+}
 
 .cards {
   display: grid;
@@ -12,7 +34,7 @@
   @include media-breakpoint-down(lg) {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   @include media-breakpoint-down(sm) {
     grid-template-columns: repeat(1, 1fr);
   }
@@ -22,15 +44,28 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    border: 1px solid #dee2e6 !important;
+    gap: 5px;
+    border: 5px solid #dee2e6 !important;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     border-radius: 10px;
     padding: 10px;
+    background: #fff;
+    opacity: .5;
+    
+    &.active {
+      opacity: 1;
+    }
+
+    &.marked {
+      border-style: dashed !important;
+      border-color: #83878b !important;
+    }
 
     > img {
       width: 150px;
       height: 150px;
       border-radius: 50%;
+      pointer-events: none;
     }
 
     > h5 {

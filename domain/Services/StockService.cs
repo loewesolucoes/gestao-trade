@@ -37,6 +37,11 @@ namespace domain.Services
         {
             _repository.SaveHistory(stockId, interval, intradays.Select(x => { x.StockId = stockId; return x; }));
         }
+
+        public void ToggleStockActive(string[] stockCodes)
+        {
+            _repository.ToggleStockActive(stockCodes);
+        }
     }
 }
 
