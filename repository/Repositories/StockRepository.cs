@@ -24,7 +24,7 @@ namespace repository.Repositories
             _context.SaveChanges();
         }
 
-        public StockWithPagingDto GetAll(string search, int page, int take)
+        public StockWithPagingDto GetAll(string? search, int page, int take)
         {
             var query = _context.Stocks
                 .Where(x => search == null || EF.Functions.ILike(x.Code, $"%{search}%") || EF.Functions.ILike(x.Name, $"%{search}%") || (x.Sector != null && EF.Functions.ILike(x.Sector, $"%{search}%")))

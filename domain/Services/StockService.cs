@@ -18,7 +18,7 @@ namespace domain.Services
             _repository.DeleteHistoryByUpdate(stockUpdate);
         }
 
-        public StockWithPagingDto GetAll(string search, int page, int take)
+        public StockWithPagingDto GetAll(string? search, int page, int take)
         {
             return _repository.GetAll(search, page, take);
         }
