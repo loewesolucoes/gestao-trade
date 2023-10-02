@@ -23,6 +23,11 @@ namespace domain.Services
             return _repository.GetAll(search, page, take);
         }
 
+        public ICollection<string> GetAllActiveCodes()
+        {
+            return _repository.GetAllActiveCodes();
+        }
+
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)
         {
             return _repository.GetLastUpdate(stockId, interval);

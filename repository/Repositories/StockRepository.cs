@@ -42,6 +42,11 @@ namespace repository.Repositories
             };
         }
 
+        public ICollection<string> GetAllActiveCodes()
+        {
+            return _context.Stocks.Where(x => x.Active).Select(x => x.Code).ToList();
+        }
+
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)
         {
             return _context.StockUpdates.OrderBy(x => x.CreatedAt).LastOrDefault(x => x.StockId == stockId && x.Interval == interval);

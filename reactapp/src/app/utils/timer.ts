@@ -1,3 +1,5 @@
+"use client";
+
 export class TimerUtil {
   /**
    * Creates a debounced function that delays invoking `func` until after `wait`

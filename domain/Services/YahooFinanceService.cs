@@ -1,16 +1,19 @@
 ﻿using System;
 using System.IO;
 using domain.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace domain.Services
 {
     public class YahooFinanceService : IYahooFinanceService
     {
+        private readonly ILogger<IYahooFinanceService> _logger;
         private readonly IStockService _stockService;
 
-        public YahooFinanceService(IStockService stockService)
+        public YahooFinanceService(IStockService stockService, ILogger<IYahooFinanceService> logger)
         {
             _stockService = stockService;
+            _logger = logger;
         }
 
         public async Task DowloadAndSaveStock(string stockId, Interval interval)
@@ -21,11 +24,14 @@ namespace domain.Services
 
             if (lastUpdateDate < DateTime.Today)
             {
-                //var result = new List<HistoricalDataRecord>() { new HistoricalDataRecord() { Date = DateTime.Now, Close = 1, AdjustedClose = 1, High = 2, Low = .5M, Open = .7M, Volume = 1000 } };
+                _logger.LogInformation($"checking {stockId}:{interval} on yahoo");
                 if (lastUpdate != null)
                     _stockService.DeleteHistoryByUpdate(lastUpdate);
 
                 var result = await DownloadHistoricalDataAsync($"{stockId}.SA", lastUpdateDate, DateTime.Today.AddDays(1));
+
+                if (result == null)
+                    throw new InvalidOperationException($"retorno do yahoo errado para ativo {stockId}");
 
                 _stockService.SaveHistory(stockId, interval, result.Select(x => new Intraday()
                 {
@@ -40,9 +46,13 @@ namespace domain.Services
                     Date = x.Date,
                 }));
             }
+            else
+            {
+                _logger.LogInformation($"stock {stockId}:{interval} is up to date");
+            }
         }
 
-        private async Task<YahooHistoricalDataRecord[]?> DownloadHistoricalDataAsync(string stockSymbol, DateTime periodStart, DateTime periodEnd, long try_count = 3)
+        private async Task<YahooHistoricalDataRecord[]?> DownloadHistoricalDataAsync(string stockSymbol, DateTime periodStart, DateTime periodEnd, long try_count = 5)
         {
             //Set up
             YahooHistoricalDataRecord[]? historicalData = null;
@@ -53,6 +63,9 @@ namespace domain.Services
 
             while (downloadResult != YahooHistoricalDataDownloadResult.Successful && haveTriedCount < try_count && downloadResult != YahooHistoricalDataDownloadResult.DataDoesNotExistForSpecifiedTimePeriod)
             {
+                if (haveTriedCount > 0)
+                    _logger.LogWarning($"trying yahoo again ({stockSymbol} => {try_count})");
+
                 var tuple = await TryGetHistoricalDatAsync(stockSymbol, periodStart, periodEnd);
 
                 historicalData = tuple.Item1;

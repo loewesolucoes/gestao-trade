@@ -1,26 +1,32 @@
 ﻿using domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace repository
 {
     public class DashContext : DbContext
     {
+        private readonly IConfiguration _configuration;
         public DbSet<Intraday> History { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<StockUpdate> StockUpdates { get; set; }
 
-        public DashContext()
+        public DashContext(IConfiguration configuration)
         {
+            _configuration = configuration;
         }
 
-        public DashContext(DbContextOptions<DashContext> options) : base(options)
+        public DashContext(DbContextOptions<DashContext> options, IConfiguration configuration) : base(options)
         {
+            _configuration = configuration;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            optionsBuilder.UseNpgsql("Host=localhost:5432;Database=dashboard;Username=postgres;Password=").EnableSensitiveDataLogging();
+            optionsBuilder
+                .UseNpgsql(_configuration.GetConnectionString("Default"))
+                .EnableSensitiveDataLogging()
+                ;
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
