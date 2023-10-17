@@ -24,7 +24,6 @@ export function Header() {
     <div className="container-fluid">
       <Link
         href="/"
-        target="_blank"
         rel="noopener noreferrer"
         className='navbar-brand logo-link'
       >

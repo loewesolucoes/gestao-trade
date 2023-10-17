@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using domain.Contracts;
 using Microsoft.Extensions.Logging;
@@ -118,6 +119,8 @@ namespace domain.Services
                     downloadResult = YahooHistoricalDataDownloadResult.OtherFailure;
                 }
 
+                _logger.LogWarning($"symbolError {downloadResult} statuscode: {fr.StatusCode}");
+
                 return Tuple.Create(historicalData, downloadResult); //Exit
             }
 
@@ -140,19 +143,18 @@ namespace domain.Services
                         string[] cols = line.Split(',', StringSplitOptions.None);
 
                         rec.Date = DateTime.Parse(cols[0]);
-                        rec.Open = System.Convert.ToDecimal(cols[1]);
-                        rec.High = System.Convert.ToDecimal(cols[2]);
-                        rec.Low = System.Convert.ToDecimal(cols[3]);
-                        rec.Close = System.Convert.ToDecimal(cols[4]);
-                        rec.AdjustedClose = System.Convert.ToDecimal(cols[5]);
-                        rec.Volume = System.Convert.ToDecimal(cols[6]);
+                        rec.Open = decimal.Parse(cols[1], CultureInfo.InvariantCulture);
+                        rec.High = decimal.Parse(cols[2], CultureInfo.InvariantCulture);
+                        rec.Low = decimal.Parse(cols[3], CultureInfo.InvariantCulture);
+                        rec.Close = decimal.Parse(cols[4], CultureInfo.InvariantCulture);
+                        rec.AdjustedClose = decimal.Parse(cols[5], CultureInfo.InvariantCulture);
+                        rec.Volume = decimal.Parse(cols[6], CultureInfo.InvariantCulture);
 
                         datarecs.Add(rec);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Unable to conver this row ({symbol}): {line}");
-                        Console.WriteLine(ex);
+                        _logger.LogError(ex, $"Unable to conver this row ({symbol}): {line}");
                     }
                 }
             }
