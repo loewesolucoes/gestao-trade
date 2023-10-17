@@ -3,24 +3,32 @@
 import "./styles.scss"
 import { useEffect, useState } from 'react';
 import { ChartComponent } from './components/chart';
-import { ChartIntraday, Stock, StockHistoryResponse, StockSearchResponse } from "./models";
+import { ChartIntraday, Stock, StockHistoryResponse, StockSearchResponse, StockHistory } from "./models";
 import { StockCard } from './components/stock-card/stock-card';
 import moment from "moment";
+import { analysisService } from "./services/analysis";
 
 export default function Home() {
-  const [initialDate, setInitialDate] = useState<string>(moment().add(-1, 'months').format('YYYY-MM-DD'));
+  const [initialDate, setInitialDate] = useState<string>(moment().add(-2, 'months').format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState<string>(moment().format('YYYY-MM-DD'));
   const [stocks, setStocks] = useState<Stock[]>();
   const [currentStock, setCurrentStock] = useState<string>();
   const [history, setHistory] = useState<ChartIntraday[]>();
+  const [historyOriginal, setHistoryOriginal] = useState<StockHistory[]>([]);
+  const [analysis, setAnalysis] = useState<any>();
 
   useEffect(() => {
     load();
   }, []);
 
   useEffect(() => {
+    setAnalysis(null);
     loadHistory();
   }, [currentStock]);
+
+  useEffect(() => {
+    setAnalysis(analysisService.run(historyOriginal, initialDate, endDate))
+  }, [historyOriginal]);
 
   async function load() {
     const response = await fetch(`https://localhost:7062/stock/actives`);
@@ -42,6 +50,8 @@ export default function Home() {
       high: x.max,
       low: x.min,
     })));
+
+    setHistoryOriginal(json.data);
   }
 
   return (
@@ -66,10 +76,20 @@ export default function Home() {
         )
       }
       {currentStock == null ? <div className="alert alert-warning">Escolha uma ação para analisar</div>
-        : (
-          history == null ? <div className="alert alert-info">Carregando historico...</div>
-            : <ChartComponent className="chart container-sm" data={history} visibleFrom={initialDate} visibleTo={endDate}></ChartComponent>
-        )
+        : <>
+          <section className="card analysis">
+            <div className="card-header">Header</div>
+            <div className="card-body">
+              {analysis == null ? <div className="alert alert-info">Carregando analises...</div>
+                : (
+                  <div>{JSON.stringify(analysis)}</div>
+                )
+              }
+            </div>
+          </section>
+          {history == null ? <div className="alert alert-info">Carregando historico...</div>
+            : <ChartComponent className="chart container-sm" data={history} visibleFrom={initialDate} visibleTo={endDate}></ChartComponent>}
+        </>
       }
     </section>
   )

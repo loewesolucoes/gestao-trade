@@ -17,10 +17,10 @@ export interface Stock {
 
 export interface StockHistoryResponse {
   success: boolean;
-  data: History[];
+  data: StockHistory[];
 }
 
-export interface History {
+export interface StockHistory {
   id: number;
   open: number;
   close: number;
