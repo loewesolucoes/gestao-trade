@@ -1,5 +1,10 @@
 @import "./bootstrap";
 
+.configs {
+  display: flex;
+  gap: 10px;
+}
+
 .stocks {
   display: flex;
   overflow-x: auto;

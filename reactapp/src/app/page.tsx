@@ -8,6 +8,8 @@ import { StockCard } from './components/stock-card/stock-card';
 import moment from "moment";
 
 export default function Home() {
+  const [initialDate, setInitialDate] = useState<string>(moment().add(-1, 'months').format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState<string>(moment().format('YYYY-MM-DD'));
   const [stocks, setStocks] = useState<Stock[]>();
   const [currentStock, setCurrentStock] = useState<string>();
   const [history, setHistory] = useState<ChartIntraday[]>();
@@ -44,6 +46,16 @@ export default function Home() {
 
   return (
     <section className='container'>
+      <div className="configs">
+        <div className="form-group">
+          <label htmlFor="dataInicio" className="form-label">Data inicio:</label>
+          <input type="date" id="dataInicio" name="dataInicio" className="form-control" value={initialDate} onChange={e => setInitialDate(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label htmlFor="dataFim" className="form-label">Data fim:</label>
+          <input type="date" id="dataFim" name="dataFim" className="form-control" value={endDate} onChange={e => setEndDate(e.target.value)} />
+        </div>
+      </div>
       {stocks == null ? <div className="alert alert-info">Carregando ações ativas...</div>
         : (
           <div className="stocks">
@@ -56,7 +68,7 @@ export default function Home() {
       {currentStock == null ? <div className="alert alert-warning">Escolha uma ação para analisar</div>
         : (
           history == null ? <div className="alert alert-info">Carregando historico...</div>
-            : <ChartComponent className="chart container-sm" data={history}></ChartComponent>
+            : <ChartComponent className="chart container-sm" data={history} visibleFrom={initialDate} visibleTo={endDate}></ChartComponent>
         )
       }
     </section>

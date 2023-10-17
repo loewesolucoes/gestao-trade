@@ -2,9 +2,19 @@
 import { useEffect, useRef } from 'react';
 import { CrosshairMode, createChart } from 'lightweight-charts';
 import { ChartIntraday } from '../models';
+import moment from 'moment';
 
-export const ChartComponent = (props: { data: ChartIntraday[], className: string }) => {
-  const { data, ...otherProps } = props;
+interface Props {
+  data: ChartIntraday[],
+  className: string,
+  visibleFrom: string,
+  visibleTo: string,
+}
+
+let chart: import('lightweight-charts').IChartApi;
+
+export const ChartComponent = (props: Props) => {
+  const { data, visibleFrom, visibleTo, ...otherProps } = props;
 
   const chartContainerRef = useRef() as any;
 
@@ -13,11 +23,11 @@ export const ChartComponent = (props: { data: ChartIntraday[], className: string
       chart.applyOptions({ width: chartContainerRef.current.clientWidth });
     };
 
-    const chart = createChart(chartContainerRef.current, {
+    chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height: 500,
       layout: {
-        textColor: 'rgba(255, 255, 255, 0.9)',
+        textColor: 'rgba(0, 0, 0, 0.9)',
       },
       grid: {
         vertLines: {
@@ -38,11 +48,11 @@ export const ChartComponent = (props: { data: ChartIntraday[], className: string
       },
     });
 
-    chart.timeScale().fitContent();
-
     const candleSeries = chart.addCandlestickSeries({});
 
     candleSeries.setData(data);
+
+    setVisibleRange();
 
     window.addEventListener('resize', handleResize);
 
@@ -52,6 +62,17 @@ export const ChartComponent = (props: { data: ChartIntraday[], className: string
       chart.remove();
     };
   }, [data]);
+
+  useEffect(() => {
+    setVisibleRange();
+  }, [visibleFrom, visibleTo]);
+
+  function setVisibleRange() {
+    if (visibleFrom == null || visibleTo == null)
+      chart.timeScale().fitContent();
+    else // @ts-ignore
+      chart.timeScale().setVisibleRange({ from: moment(visibleFrom).unix(), to: moment(visibleTo).unix() });
+  }
 
   return (
     <div
