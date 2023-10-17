@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PaginationControl } from "../components/pagination";
 import { TimerUtil } from "../utils/timer";
 import { Stock, StockSearchResponse } from "../models";
-import { StockCard } from "../components/stock-card";
+import { StockCard } from "../components/stock-card/stock-card";
 
 const PAGE_PARAM_NAME = "page";
 const SEARCH_PARAM_NAME = "q";

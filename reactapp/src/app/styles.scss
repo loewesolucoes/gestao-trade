@@ -1,0 +1,27 @@
+@import "./bootstrap";
+
+.stocks {
+  display: flex;
+  overflow-x: auto;
+  gap: 5px;
+  margin: 10px auto;
+
+  > .stock-card {
+    >h4 {
+      font-size: 16px;
+    }
+
+    > small {
+      font-size: 13px;
+    }
+
+    > img {
+      width: 75px;
+      height: 75px;
+    }
+
+    > .info {
+      display: none;
+    }
+  }
+}
