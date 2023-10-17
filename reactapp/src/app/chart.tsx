@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { CrosshairMode, createChart } from 'lightweight-charts';
 import { ChartIntraday } from './models';
 
-export const ChartComponent = (props: { data: ChartIntraday }) => {
+export const ChartComponent = (props: { data: ChartIntraday[], className: string }) => {
   const { data } = props;
 
   const chartContainerRef = useRef() as any;
