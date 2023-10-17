@@ -103,6 +103,11 @@ namespace repository.Repositories
             _context.UpdateRange(stocks);
             _context.SaveChanges();
         }
+
+        public ICollection<Intraday> GetHistory(string stockId)
+        {
+            return _context.History.Where(x => x.StockId == stockId).ToList();
+        }
     }
 }
 

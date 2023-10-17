@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useRef } from 'react';
 import { CrosshairMode, createChart } from 'lightweight-charts';
+import { ChartIntraday } from './models';
 
-export const ChartComponent = (props: any) => {
-  // const { data } = props;
-  const data = initialData;
+export const ChartComponent = (props: { data: ChartIntraday }) => {
+  const { data } = props;
 
   const chartContainerRef = useRef() as any;
 

@@ -13,6 +13,7 @@ namespace domain.Contracts
         bool IsUpdated(string stockId, Interval interval);
         void SaveHistory(string stockId, Interval interval, IEnumerable<Intraday> intradays);
         void ToggleStockActive(string[] stockCodes);
+        ICollection<Intraday> GetHistory(string stockId);
     }
 
     public interface IStockRepository
@@ -26,6 +27,7 @@ namespace domain.Contracts
         void Save(ICollection<Stock> stocks);
         void SaveHistory(string stockId, Interval interval, IEnumerable<Intraday> enumerable);
         void ToggleStockActive(string[] stockCodes);
+        ICollection<Intraday> GetHistory(string stockId);
     }
 }
 

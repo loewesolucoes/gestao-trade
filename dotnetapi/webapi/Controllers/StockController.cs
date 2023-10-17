@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using domain;
 using domain.Contracts;
 using domain.Dtos;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +55,7 @@ namespace webapi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Index");
+                _logger.LogError(ex, "Actives");
                 return BadRequest(new { success = false, });
             }
 
@@ -62,6 +63,28 @@ namespace webapi.Controllers
             {
                 success = true,
                 data = stock,
+            });
+        }
+
+        [HttpGet("history")]
+        public IActionResult History(string stockId)
+        {
+            ICollection<Intraday> history;
+
+            try
+            {
+                history = _stockService.GetHistory(stockId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "History");
+                return BadRequest(new { success = false, });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                data = history,
             });
         }
 

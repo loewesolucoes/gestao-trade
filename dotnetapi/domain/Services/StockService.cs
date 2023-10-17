@@ -33,6 +33,11 @@ namespace domain.Services
             return _repository.GetAllActives();
         }
 
+        public ICollection<Intraday> GetHistory(string stockId)
+        {
+            return _repository.GetHistory(stockId);
+        }
+
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)
         {
             return _repository.GetLastUpdate(stockId, interval);
