@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "webapi", "webapi\webapi.csproj", "{9E870B7F-2ACF-4FFF-A08A-0C52C2902A7D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "console", "console\console.csproj", "{12E806CB-3761-417C-985A-B30DAA9BE631}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "domain", "domain\domain.csproj", "{FF5D5601-EF21-450F-BBD1-1463C5271069}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "repository", "repository\repository.csproj", "{946A41D7-2D77-43D3-ABDA-E6DCD27A8972}"
@@ -16,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens da Solução", "Itens
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backgroundjobs", "backgroundjobs\backgroundjobs.csproj", "{D966F97B-B82C-45D9-85AB-144A7886B3A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "backgroundjobs", "backgroundjobs\backgroundjobs.csproj", "{D966F97B-B82C-45D9-85AB-144A7886B3A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +26,6 @@ Global
 		{9E870B7F-2ACF-4FFF-A08A-0C52C2902A7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E870B7F-2ACF-4FFF-A08A-0C52C2902A7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E870B7F-2ACF-4FFF-A08A-0C52C2902A7D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12E806CB-3761-417C-985A-B30DAA9BE631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12E806CB-3761-417C-985A-B30DAA9BE631}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12E806CB-3761-417C-985A-B30DAA9BE631}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12E806CB-3761-417C-985A-B30DAA9BE631}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FF5D5601-EF21-450F-BBD1-1463C5271069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FF5D5601-EF21-450F-BBD1-1463C5271069}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF5D5601-EF21-450F-BBD1-1463C5271069}.Release|Any CPU.ActiveCfg = Release|Any CPU
