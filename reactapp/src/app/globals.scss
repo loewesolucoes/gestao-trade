@@ -5,6 +5,8 @@
 @import "../../node_modules/bootstrap/scss/forms/form-control";
 @import "../../node_modules/bootstrap/scss/forms/labels";
 @import "../../node_modules/bootstrap/scss/buttons";
+@import "../../node_modules/bootstrap/scss/nav";
+@import "../../node_modules/bootstrap/scss/navbar";
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -40,11 +42,11 @@ header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+}
 
-  > .logo-link {
-    > svg {
-      width: 100px;
-      height: 100px;
-    }
+.logo-link {
+  > svg {
+    width: 70px;
+    height: 70px;
   }
 }

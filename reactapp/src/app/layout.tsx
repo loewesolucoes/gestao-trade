@@ -1,8 +1,7 @@
 import './globals.scss'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Logo from "./logo.svg"
-import Link from 'next/link'
+import { Header } from './components/header'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,19 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <header>
-          <Link
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className='logo-link'
-          >
-            <Logo />
-          </Link>
-          <h1>
-            Dashboard trader
-          </h1>
-        </header>
+        <Header />
         <main>
           {children}
         </main>
@@ -39,3 +26,5 @@ export default function RootLayout({
     </html>
   )
 }
+
+
