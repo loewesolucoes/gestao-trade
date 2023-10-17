@@ -28,6 +28,11 @@ namespace domain.Services
             return _repository.GetAllActiveCodes();
         }
 
+        public StockWithPagingDto GetAllActives()
+        {
+            return _repository.GetAllActives();
+        }
+
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)
         {
             return _repository.GetLastUpdate(stockId, interval);

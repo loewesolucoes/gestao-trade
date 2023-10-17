@@ -43,7 +43,29 @@ namespace webapi.Controllers
             });
         }
 
-        [HttpPost("ToggleStockActive")]
+        [HttpGet("actives")]
+        public IActionResult Actives()
+        {
+            StockWithPagingDto stock;
+
+            try
+            {
+                stock = _stockService.GetAllActives();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Index");
+                return BadRequest(new { success = false, });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                data = stock,
+            });
+        }
+
+        [HttpPost("toggle_stock_active")]
         public IActionResult ToggleStockActive(string[] stockCodes)
         {
 
@@ -60,7 +82,6 @@ namespace webapi.Controllers
 
             return Ok(new { success = true, });
         }
-
     }
 }
 

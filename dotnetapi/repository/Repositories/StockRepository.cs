@@ -29,7 +29,8 @@ namespace repository.Repositories
             var query = _context.Stocks
                 .Where(x => search == null || EF.Functions.ILike(x.Code, $"%{search}%") || EF.Functions.ILike(x.Name, $"%{search}%") || (x.Sector != null && EF.Functions.ILike(x.Sector, $"%{search}%")))
                 .OrderBy(x => !x.Active)
-                .ThenBy(x => x.Code);
+                .ThenBy(x => x.Code)
+                ;
             var stocks = query.Skip(page * take).Take(take).ToList();
             var total = query.Count();
 
@@ -38,6 +39,26 @@ namespace repository.Repositories
                 Stocks = stocks,
                 Page = page,
                 Take = take,
+                Total = total,
+            };
+        }
+
+        public StockWithPagingDto GetAllActives()
+        {
+            var query = _context.Stocks
+                .Where(x => x.Active)
+                .OrderBy(x => x.Code)
+                .ThenBy(x => x.CreatedAt)
+                ;
+
+            var stocks = query.ToList();
+            var total = query.Count();
+
+            return new StockWithPagingDto()
+            {
+                Stocks = stocks,
+                Page = 1,
+                Take = total,
                 Total = total,
             };
         }
