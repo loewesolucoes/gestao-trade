@@ -106,7 +106,11 @@ namespace repository.Repositories
 
         public ICollection<Intraday> GetHistory(string stockId)
         {
-            return _context.History.Where(x => x.StockId == stockId).ToList();
+            return _context.History
+                .Where(x => x.StockId == stockId)
+                .OrderBy(x => x.Date)
+                .ToList()
+                ;
         }
     }
 }

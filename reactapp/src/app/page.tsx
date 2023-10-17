@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { ChartComponent } from './chart';
 import { Stock, StockHistoryResponse, StockSearchResponse } from "./models";
 import { StockCard } from './components/stock-card/stock-card';
+import moment from "moment";
 
 export default function Home() {
   const [stocks, setStocks] = useState<Stock[]>([]);
@@ -36,7 +37,7 @@ export default function Home() {
     const json = (await response.json()) as StockHistoryResponse;
 
     setHistory(json.data.map(x => ({
-      time: x.date,
+      time: moment(x.date).format('YYYY-MM-DD'),
       open: x.open,
       close: x.close,
       high: x.max,
