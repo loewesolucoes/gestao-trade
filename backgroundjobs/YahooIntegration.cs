@@ -10,7 +10,7 @@ namespace backgroundjobs
     {
         public static readonly string JOB_GROUP = "feeder";
         public static readonly JobKey JOB_KEY = new JobKey("YahooIntegration", JOB_GROUP);
-        public static readonly string JOB_TRIGGER = "trigger_inicial";
+        public static readonly string JOB_TRIGGER = "yahootrigger";
         public static readonly string JOB_DESCRIPTION = "Integration into Yahoo finance";
 
         private readonly IYahooFinanceService _yahooservice;

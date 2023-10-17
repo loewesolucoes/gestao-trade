@@ -47,9 +47,17 @@ namespace repository.Repositories
             return _context.Stocks.Where(x => x.Active).Select(x => x.Code).ToList();
         }
 
+        public Stock? GetLastStockAdded() => _context.Stocks.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+
         public StockUpdate? GetLastUpdate(string stockId, Interval interval)
         {
             return _context.StockUpdates.OrderBy(x => x.CreatedAt).LastOrDefault(x => x.StockId == stockId && x.Interval == interval);
+        }
+
+        public void Save(ICollection<Stock> stocks)
+        {
+            _context.Stocks.AddRange(stocks);
+            _context.SaveChanges();
         }
 
         public void SaveHistory(string stockId, Interval interval, IEnumerable<Intraday> intradays)

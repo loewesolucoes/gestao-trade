@@ -93,6 +93,14 @@ static void ConfigureQuartz(WebApplicationBuilder builder)
         });
 
         options.AddJob<YahooIntegration>(YahooIntegration.JOB_KEY, j => j.WithDescription(YahooIntegration.JOB_DESCRIPTION));
+        options.AddJob<BrapiIntegration>(BrapiIntegration.JOB_KEY, j => j.WithDescription(BrapiIntegration.JOB_DESCRIPTION));
+
+        options.AddTrigger(t => t
+                .WithIdentity(BrapiIntegration.JOB_TRIGGER)
+                .ForJob(BrapiIntegration.JOB_KEY)
+                .StartNow()
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromDays(15)).RepeatForever())
+            );
 
         options.AddTrigger(t => t
                 .WithIdentity(YahooIntegration.JOB_TRIGGER)

@@ -19,7 +19,9 @@ namespace domain.Contracts
         void DeleteHistoryByUpdate(StockUpdate stockUpdate);
         StockWithPagingDto GetAll(string? search, int page, int take);
         ICollection<string> GetAllActiveCodes();
+        Stock? GetLastStockAdded();
         StockUpdate? GetLastUpdate(string stockId, Interval interval);
+        void Save(ICollection<Stock> stocks);
         void SaveHistory(string stockId, Interval interval, IEnumerable<Intraday> enumerable);
         void ToggleStockActive(string[] stockCodes);
     }
