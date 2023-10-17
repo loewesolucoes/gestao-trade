@@ -2,7 +2,7 @@
 
 import "./styles.scss"
 import { useEffect, useState } from 'react';
-import { ChartComponent } from './chart';
+import { ChartComponent } from './components/chart';
 import { ChartIntraday, Stock, StockHistoryResponse, StockSearchResponse } from "./models";
 import { StockCard } from './components/stock-card/stock-card';
 import moment from "moment";
@@ -56,7 +56,7 @@ export default function Home() {
       {currentStock == null ? <div className="alert alert-warning">Escolha uma ação para analisar</div>
         : (
           history == null ? <div className="alert alert-info">Carregando historico...</div>
-            : <ChartComponent className="chart" data={history}></ChartComponent>
+            : <ChartComponent className="chart container-sm" data={history}></ChartComponent>
         )
       }
     </section>
