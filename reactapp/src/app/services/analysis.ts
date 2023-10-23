@@ -41,10 +41,13 @@ class AnalysisService {
       x.fibo618 = first.min + .618 * (last.max - first.min);
       x.fibo50 = first.min + .50 * (last.max - first.min); 
       x.fibo1000 = last.max; // y
-      x.alvo1 = ((x.fibo618 - x.fibo0) / .618) + x.fibo0; // y2 = ((x - z) / 0,618) + z
-      x.alvo2 = ((x.fibo50 - x.fibo0) / .5) + x.fibo0; // y3 = ((x - z) / 0,5) + z
-      x.alvo3 = ((x.fibo382 - x.fibo0) / .382) + x.fibo0; // y4 = ((x - z) / 0,382) + z
+      x.alvo1 = ((x.fibo618 - x.fibo0) / .618) + x.fibo618; // y2 = ((x - z) / 0,618) + x
+      x.alvo2 = ((x.fibo50 - x.fibo0) / .5) + x.fibo1000; // y3 = ((x - z) / 0,5) + y
+      x.alvo3 = ((x.fibo382 - x.fibo0) / .382) + x.alvo1; // y4 = ((x - z) / 0,382) + y2
     });
+
+    console.log(analiseFinal);
+    
 
     return analiseFinal;
   }
