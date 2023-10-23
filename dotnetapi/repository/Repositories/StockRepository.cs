@@ -18,7 +18,7 @@ namespace repository.Repositories
 
         public void DeleteHistoryByUpdate(StockUpdate stockUpdate)
         {
-            var historyToDelete = _context.History.Where(x => x.StockId == stockUpdate.StockId && x.Interval == stockUpdate.Interval && x.Date >= stockUpdate.CreatedAt).ToList();
+            var historyToDelete = _context.History.Where(x => x.StockId == stockUpdate.StockId && x.Interval == stockUpdate.Interval && x.CreatedAt >= stockUpdate.CreatedAt).ToList();
 
             _context.History.RemoveRange(historyToDelete);
             _context.SaveChanges();

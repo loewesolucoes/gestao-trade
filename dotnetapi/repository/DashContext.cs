@@ -10,7 +10,7 @@ namespace repository
         public DbSet<Intraday> History { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<StockUpdate> StockUpdates { get; set; }
-
+        
         public DashContext(IConfiguration configuration)
         {
             _configuration = configuration;

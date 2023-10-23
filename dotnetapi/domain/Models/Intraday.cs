@@ -1,6 +1,6 @@
 ﻿namespace domain;
 
-public class Intraday   
+public class Intraday : ICreationTrackable
 {
     public long Id { get; set; }
     public decimal Open { get; set; }
@@ -11,6 +11,7 @@ public class Intraday
     public decimal Volume { get; set; }
     public DateTime Date { get; set; }
     public Interval Interval { get; set; }
+    public DateTime CreatedAt { get; set; }
 
 
     public string StockId { get; set; }
