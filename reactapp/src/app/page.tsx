@@ -9,7 +9,7 @@ import moment from "moment";
 import { analysisService } from "./services/analysis";
 
 export default function Home() {
-  const [initialDate, setInitialDate] = useState<string>(moment().add(-2, 'months').format('YYYY-MM-DD'));
+  const [initialDate, setInitialDate] = useState<string>(moment().add(-5, 'months').format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState<string>(moment().format('YYYY-MM-DD'));
   const [stocks, setStocks] = useState<Stock[]>();
   const [currentStock, setCurrentStock] = useState<string>();
@@ -82,7 +82,7 @@ export default function Home() {
             <div className="card-body">
               {analysis == null ? <div className="alert alert-info">Carregando analises...</div>
                 : (
-                  <div>{JSON.stringify(analysis)}</div>
+                  <div style={{ "whiteSpace": "pre" }}>{filterAnalysis(analysis)}</div>
                 )
               }
             </div>
@@ -94,3 +94,14 @@ export default function Home() {
     </section>
   )
 }
+function filterAnalysis(analysis: any): any {
+  return JSON.stringify(
+    analysis
+      .filter((x: any) => x.bateuAlvo1)
+      .map((x: any) => {
+        x.movements = undefined;
+        return x;
+      })
+    , null, 4);
+}
+
