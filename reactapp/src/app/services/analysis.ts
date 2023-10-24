@@ -61,31 +61,31 @@ class AnalysisService {
   }
 
   private detectarToposEFundos(history: StockHistory[]) {
-    const historyComTipo = history.map(x => ({ ...x, type: x.open <= x.close ? MovementType.SUBIDA : MovementType.DESCIDA }));
-    const toposEFundos = [] as any[];
-    let temp: any[];
+    let movements: any[];
 
-    historyComTipo.forEach(x => {
-      if (temp != null) {
-        const lastTemp = temp[temp.length - 1];
+    return history
+      .map(x => ({ ...x, type: x.open <= x.close ? MovementType.SUBIDA : MovementType.DESCIDA }))
+      .reduce((previous, next) => {
+        if (movements != null) {
+          const lastMovement = movements[movements.length - 1];
 
-        if (lastTemp?.type != x.type) {
-          toposEFundos.push({
-            movements: temp,
-            type: lastTemp.type
-          });
-          temp = [];
-        }
-      } else
-        temp = [];
+          if (lastMovement?.type != next.type) {
+            previous.push({
+              movements: movements,
+              type: lastMovement.type
+            });
+            movements = [];
+          }
+        } else
+          movements = [];
 
-      const lastTempAgain = temp[temp.length - 1];
+        const lastMovementAgain = movements[movements.length - 1];
 
-      if (lastTempAgain == null || lastTempAgain.type == x.type)
-        temp.push({ type: x.type, min: x.min, max: x.max });
-    });
+        if (lastMovementAgain == null || lastMovementAgain.type == next.type)
+          movements.push({ type: next.type, min: next.min, max: next.max });
 
-    return toposEFundos;
+        return previous;
+      }, [] as any[]);
   }
 }
 
