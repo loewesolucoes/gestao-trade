@@ -6,19 +6,26 @@ enum MovementType {
   DESCIDA = "DESCIDA"
 }
 
+enum TopBottomType {
+  TOPO = "TOPO",
+  FUNDO = "FUNDO"
+}
+
 class AnalysisService {
   run(historyOriginal: StockHistory[], initialDate: string, endDate: string): any {
     if (historyOriginal.length === 0) return [];
-    // const filteredHistory = historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate))
-    const toposEFundos = this.detectarToposEFundos(historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate)));
+    const filteredHistory = historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate));
 
+    const toposEFundos = this.toposEFundos(filteredHistory);
     console.log(toposEFundos);
-    const toposEFundosComFibo = this.criarFiboEAlvos(toposEFundos);
+    const movements = this.parseToMovements(filteredHistory);
+    console.log(movements);
+    const movementsWithFibo = this.criarFiboEAlvos(movements);
 
-    console.log(toposEFundosComFibo.filter(x => x.bateuAlvo1));
+    console.log(movementsWithFibo.filter(x => x.bateuAlvo1));
 
 
-    return toposEFundosComFibo;
+    return movementsWithFibo;
   }
 
   private criarFiboEAlvos(toposEFundos: any[]) {
@@ -60,7 +67,7 @@ class AnalysisService {
     });
   }
 
-  private detectarToposEFundos(history: StockHistory[]) {
+  private parseToMovements(history: StockHistory[]) {
     let movements: any[];
 
     return history
@@ -86,6 +93,32 @@ class AnalysisService {
 
         return previous;
       }, [] as any[]);
+  }
+
+  private toposEFundos(history: StockHistory[], periodos = 2) {
+    const first = history[0];
+    const second = history[1];
+    const topOrBottom = { ...first, type: first.max >= second.max ? TopBottomType.TOPO : TopBottomType.FUNDO, confirmed: true, index: 0 };
+
+    history
+      .slice(1)
+      .reduce((previous, next, index) => {
+        const last = previous[previous.length - 1];
+
+        if (!last.confirmed) {
+          if (last.type == TopBottomType.TOPO && last.max >= next.max && last.index - index > periodos)
+            last.confirmed = true;
+
+          if (last.type == TopBottomType.FUNDO && last.min <= next.min && last.index - index > periodos)
+            last.confirmed = true;
+        } else {
+          
+        }
+
+
+
+        return previous;
+      }, [topOrBottom]);
   }
 }
 
