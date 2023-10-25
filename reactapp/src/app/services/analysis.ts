@@ -16,14 +16,13 @@ class AnalysisService {
     if (historyOriginal.length === 0) return [];
     const filteredHistory = historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate));
 
-    const toposEFundos = this.toposEFundos(filteredHistory);
+    const toposEFundos = this.detectar_topos_e_fundos(filteredHistory, 2);
     console.log(toposEFundos);
     const movements = this.parseToMovements(filteredHistory);
     console.log(movements);
     const movementsWithFibo = this.criarFiboEAlvos(movements);
 
-    console.log(movementsWithFibo.filter(x => x.bateuAlvo1));
-
+    console.log(movementsWithFibo.filter(x => x.bateuAlvo1).map(x => ({ ...x })));
 
     return movementsWithFibo;
   }
@@ -112,13 +111,31 @@ class AnalysisService {
           if (last.type == TopBottomType.FUNDO && last.min <= next.min && last.index - index > periodos)
             last.confirmed = true;
         } else {
-          
+
         }
 
 
 
         return previous;
       }, [topOrBottom]);
+  }
+
+  private detectar_topos_e_fundos(dados_do_ativo: StockHistory[], periodos: number) {
+    let topos = [];
+    let fundos = [];
+
+    const dadosTopos = dados_do_ativo.map(x => x.max);
+    const dadosFundos = dados_do_ativo.map(x => x.min);
+
+    for (let i = 1; i < dados_do_ativo.length - 1; i++) {
+      if (dadosTopos[i] > Math.max(...dadosTopos.slice(i - periodos, i)) && dadosTopos[i] > Math.max(...dadosTopos.slice(i + 1, i + periodos + 1))) {
+        topos.push(dados_do_ativo[i]);
+      } else if (dadosFundos[i] < Math.min(...dadosFundos.slice(i - periodos, i)) && dadosFundos[i] < Math.min(...dadosFundos.slice(i + 1, i + periodos + 1))) {
+        fundos.push(dados_do_ativo[i]);
+      }
+    }
+
+    return { topos, fundos };
   }
 }
 
