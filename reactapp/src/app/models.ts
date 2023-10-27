@@ -31,7 +31,7 @@ export interface StockHistory {
   date: Date;
   interval: Interval;
   stockId: string;
-  stock: null;
+  stock?: any;
 }
 
 export interface ChartIntraday {
