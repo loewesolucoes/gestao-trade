@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script type="text/javascript" src="./intraday.mock.js"></script>
+  <script type="text/javascript">
+    window.onload = function () {
+      var data = window.intraday;
+
+
+      var options = {
+        animationEnabled: true,
+        theme: "light2", // "light1", "light2", "dark1", "dark2"
+        exportEnabled: true,
+        title: {
+          text: "Stock Price: AT&T Vs Verizon for 2016"
+        },
+        axisX: {
+          valueFormatString: "MMM"
+        },
+        axisY: {
+          prefix: "$",
+          title: "Price (in USD)"
+        },
+        data: [{
+          type: "candlestick",
+          yValueFormatString: "$###0.00",
+          xValueFormatString: "MMM",
+          dataPoints: data.map(x => ({
+            x: x.date,
+            y: [x.open, x.max, x.min, x.close]
+          }))
+        }]
+      };
+      $("#chartContainer").CanvasJSChart(options);
+
+    }
+  </script>
+</head>
+
+<body>
+  <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="https://cdn.canvasjs.com/jquery.canvasjs.min.js"></script>
+</body>
+
+</html>

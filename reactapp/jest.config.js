@@ -6,6 +6,7 @@ const createJestConfig = nextJest({
 
 const customJestConfig = {
   moduleDirectories: ["node_modules", "<rootDir>/"],
+  modulePathIgnorePatterns: ["__mocks__", "mock"],
   testEnvironment: "jest-environment-jsdom",
 };
 
