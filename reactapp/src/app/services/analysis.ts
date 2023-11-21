@@ -149,15 +149,17 @@ class AnalysisService {
           order: i - order,
           date: data[i].date,
           data: data[i],
+          type: TopBottomType.TOPO,
         })
       }
-      
+
       if (this.rw_bottom(data, i, order)) {
         bottoms.push({
           index: i,
           order: i - order,
           date: data[i].date,
           data: data[i],
+          type: TopBottomType.FUNDO,
         })
       }
     }
@@ -167,16 +169,15 @@ class AnalysisService {
 
   // tks https://www.youtube.com/watch?v=X31hyMhB-3s
   // Checks if there is a local top detected at curr index
-  private rw_top(data: StockHistory[], curr_index: number, order: number) {
-    if (curr_index < order * 2 + 1)
-      return false
-
+  private rw_top(data: StockHistory[], index: number, order: number) {
     var top = true
-    var k = curr_index - order
-    var v = data[k].max
+    var currentMax = data[index].max
 
-    for (let i = 1; i < order + 1; i++) {
-      if (data[k + i].max > v || data[k - i].max > v) {
+    for (let orderIndex = 1; orderIndex < order + 1; orderIndex++) {
+      const nextMax = data[index + orderIndex]?.max;
+      const proximoEhMaior = currentMax <= nextMax;
+
+      if (proximoEhMaior) {
         top = false
         break;
       }
@@ -185,16 +186,15 @@ class AnalysisService {
     return top
   }
 
-  private rw_bottom(data: StockHistory[], curr_index: number, order: number) {
-    if (curr_index < order * 2 + 1)
-      return false
-
+  private rw_bottom(data: StockHistory[], index: number, order: number) {
     var bottom = true
-    var k = curr_index - order
-    var v = data[k].min
+    var currentMin = data[index].min
 
-    for (let i = 1; i < order + 1; i++) {
-      if (data[k + i].min < v || data[k - i].min < v) {
+    for (let orderIndex = 1; orderIndex < order + 1; orderIndex++) {
+      const nextMin = data[index + orderIndex]?.min;
+      const proximoEhMenor = currentMin >= nextMin;
+
+      if (proximoEhMenor) {
         bottom = false
         break;
       }

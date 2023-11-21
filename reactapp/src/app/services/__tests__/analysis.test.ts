@@ -12,7 +12,25 @@ describe("analysis service", () => {
     //@ts-ignore
     const result: any = analysisService.rw_extremes(intraday, 2)
 
-    console.log(result);
+    const toposEFundos = result.tops.concat(result.bottoms).sort((x, y) => {
+      if (x.index < y.index)
+        return -1;
+
+      if (x.index > y.index)
+        return 1;
+
+      return 0;
+    }) as any[];
+
+    console.log(toposEFundos.reduce(((previous, next) => {
+      if (previous[previous.length - 1]?.type != next.type) {
+        previous.push(next);
+      }
+
+      return previous;
+    }), [] as any[]));
+
+
     // console.log(result.tops);
 
     expect(result).not.toBeNull();
