@@ -9,9 +9,14 @@ describe("analysis service", () => {
   it("find tops and bottoms", () => {
     // check if all components are rendered
 
-    const result = (analysisService as any).detectar_topos_e_fundos(intraday, 2)
+    //@ts-ignore
+    const result: any = analysisService.rw_extremes(intraday, 2)
+
+    console.log(result);
+    // console.log(result.tops);
+
     expect(result).not.toBeNull();
-    expect(result.topos).toHaveLength(2);
-    expect(result.fundos).toHaveLength(2);
+    expect(result.tops).toHaveLength(3);
+    expect(result.bottoms).toHaveLength(2);
   });
 });

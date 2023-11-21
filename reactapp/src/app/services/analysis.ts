@@ -16,7 +16,7 @@ class AnalysisService {
     if (historyOriginal.length === 0) return [];
     const filteredHistory = historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate));
 
-    const toposEFundos = this.detectar_topos_e_fundos(filteredHistory, 2);
+    const toposEFundos = this.rw_extremes(filteredHistory, 2);
     console.log(toposEFundos);
     const movements = this.parseToMovements(filteredHistory);
     console.log(movements);
@@ -137,6 +137,72 @@ class AnalysisService {
 
     return { topos, fundos };
   }
+
+  private rw_extremes(data: StockHistory[], order: number) {
+    const tops = []
+    const bottoms = []
+
+    for (let i = 0; i < data.length; i++) {
+      if (this.rw_top(data, i, order)) {
+        tops.push({
+          index: i,
+          order: i - order,
+          date: data[i].date,
+          data: data[i],
+        })
+      }
+      
+      if (this.rw_bottom(data, i, order)) {
+        bottoms.push({
+          index: i,
+          order: i - order,
+          date: data[i].date,
+          data: data[i],
+        })
+      }
+    }
+
+    return { tops, bottoms }
+  }
+
+  // tks https://www.youtube.com/watch?v=X31hyMhB-3s
+  // Checks if there is a local top detected at curr index
+  private rw_top(data: StockHistory[], curr_index: number, order: number) {
+    if (curr_index < order * 2 + 1)
+      return false
+
+    var top = true
+    var k = curr_index - order
+    var v = data[k].max
+
+    for (let i = 1; i < order + 1; i++) {
+      if (data[k + i].max > v || data[k - i].max > v) {
+        top = false
+        break;
+      }
+    }
+
+    return top
+  }
+
+  private rw_bottom(data: StockHistory[], curr_index: number, order: number) {
+    if (curr_index < order * 2 + 1)
+      return false
+
+    var bottom = true
+    var k = curr_index - order
+    var v = data[k].min
+
+    for (let i = 1; i < order + 1; i++) {
+      if (data[k + i].min < v || data[k - i].min < v) {
+        bottom = false
+        break;
+      }
+    }
+
+    return bottom
+  }
+
 }
 
 
