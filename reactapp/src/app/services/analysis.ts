@@ -177,7 +177,7 @@ class AnalysisService {
       const nextMax = data[index + orderIndex]?.max;
       const proximoEhMaior = currentMax <= nextMax;
 
-      if (proximoEhMaior) {
+      if (nextMax == null || proximoEhMaior) {
         top = false
         break;
       }
@@ -194,7 +194,7 @@ class AnalysisService {
       const nextMin = data[index + orderIndex]?.min;
       const proximoEhMenor = currentMin >= nextMin;
 
-      if (proximoEhMenor) {
+      if (nextMin == null || proximoEhMenor) {
         bottom = false
         break;
       }

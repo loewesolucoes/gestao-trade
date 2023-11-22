@@ -2,8 +2,7 @@ import { analysisService } from '../analysis'
 import { intraday } from './intraday.mock';
 import { writeFileSync } from 'fs';
 
-if (process.env.DASH_HABILITA_GENERATED_MOCK !== "false")
-  writeFileSync('./src/app/services/__tests__/intraday.generatedmock.js', `window.intraday = ${JSON.stringify(intraday)}`);
+generateIMock();
 
 describe("analysis service", () => {
 
@@ -33,13 +32,22 @@ describe("analysis service", () => {
 
     console.log(toposEFundosCompleto);
 
-    if (process.env.DASH_HABILITA_GENERATED_MOCK !== "false")
-      writeFileSync('./src/app/services/__tests__/topos_e_fundos.generatedmock.js', `window.toposEFundos = ${JSON.stringify(toposEFundosCompleto)}`);
+    generateTFMock(toposEFundosCompleto);
 
     // console.log(result.tops);
 
     expect(result).not.toBeNull();
-    expect(result.tops).toHaveLength(3);
-    expect(result.bottoms).toHaveLength(2);
+    expect(toposEFundosCompleto.filter(x => x.type == "TOPO")).toHaveLength(3);
+    expect(toposEFundosCompleto.filter(x => x.type == "FUNDO")).toHaveLength(3);
   });
 });
+
+function generateIMock() {
+  if (process.env.DASH_HABILITA_GENERATED_MOCK !== "false")
+    writeFileSync('./src/app/services/__tests__/intraday.generatedmock.js', `window.intraday = ${JSON.stringify(intraday)}`);
+}
+
+function generateTFMock(toposEFundosCompleto: any) {
+  if (process.env.DASH_HABILITA_GENERATED_MOCK !== "false")
+    writeFileSync('./src/app/services/__tests__/topos_e_fundos.generatedmock.js', `window.toposEFundos = ${JSON.stringify(toposEFundosCompleto)}`);
+}
