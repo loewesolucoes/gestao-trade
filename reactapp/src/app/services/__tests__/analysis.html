@@ -4,9 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <script type="text/javascript" src="./intraday.generatedmock.js"></script>
+  <script type="text/javascript" src="./topos_e_fundos.generatedmock.js"></script>
   <script type="text/javascript">
     window.onload = function () {
       var data = window.intraday.map(x => {
+        x.date = new Date(x.date);
+
+        return x;
+      });
+
+      var toposEFundos = window.toposEFundos.map(x => {
         x.date = new Date(x.date);
 
         return x;
@@ -26,15 +33,26 @@
           prefix: "$",
           title: "Price (in USD)"
         },
-        data: [{
-          type: "candlestick",
-          yValueFormatString: "$###0.00",
-          xValueFormatString: "MMM",
-          dataPoints: data.map(x => ({
-            x: x.date,
-            y: [x.open, x.max, x.min, x.close]
-          }))
-        }]
+        data: [
+          {
+            type: "candlestick",
+            yValueFormatString: "$###0.00",
+            xValueFormatString: "MMM",
+            dataPoints: data.map(x => ({
+              x: x.date,
+              y: [x.open, x.max, x.min, x.close]
+            }))
+          },
+          {
+            type: "scatter",
+            color: 'transparent',
+            dataPoints: toposEFundos.map(x => ({
+              x: x.date,
+              y: x.type === 'FUNDO' ? x.data.min - 20 : x.data.max + 20,
+              indexLabel: x.type
+            }))
+          }
+        ]
       };
       $("#chartContainer").CanvasJSChart(options);
 

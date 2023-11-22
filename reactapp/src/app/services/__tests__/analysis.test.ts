@@ -2,7 +2,8 @@ import { analysisService } from '../analysis'
 import { intraday } from './intraday.mock';
 import { writeFileSync } from 'fs';
 
-writeFileSync('./src/app/services/__tests__/intraday.generatedmock.js', `window.intraday = ${JSON.stringify(intraday)}`)
+if (process.env.DASH_HABILITA_GENERATED_MOCK !== "false")
+  writeFileSync('./src/app/services/__tests__/intraday.generatedmock.js', `window.intraday = ${JSON.stringify(intraday)}`);
 
 describe("analysis service", () => {
 
@@ -22,14 +23,18 @@ describe("analysis service", () => {
       return 0;
     }) as any[];
 
-    console.log(toposEFundos.reduce(((previous, next) => {
+    const toposEFundosCompleto = toposEFundos.reduce(((previous, next) => {
       if (previous[previous.length - 1]?.type != next.type) {
         previous.push(next);
       }
 
       return previous;
-    }), [] as any[]));
+    }), [] as any[]);
 
+    console.log(toposEFundosCompleto);
+
+    if (process.env.DASH_HABILITA_GENERATED_MOCK !== "false")
+      writeFileSync('./src/app/services/__tests__/topos_e_fundos.generatedmock.js', `window.toposEFundos = ${JSON.stringify(toposEFundosCompleto)}`);
 
     // console.log(result.tops);
 
