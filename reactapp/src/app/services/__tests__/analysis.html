@@ -3,11 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <script type="text/javascript" src="./intraday.mock.js"></script>
+  <script type="text/javascript" src="./intraday.generatedmock.js"></script>
   <script type="text/javascript">
     window.onload = function () {
-      var data = window.intraday;
+      var data = window.intraday.map(x => {
+        x.date = new Date(x.date);
 
+        return x;
+      });
 
       var options = {
         animationEnabled: true,

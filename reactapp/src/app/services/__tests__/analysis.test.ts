@@ -1,8 +1,8 @@
 import { analysisService } from '../analysis'
-import './intraday.mock';
+import { intraday } from './intraday.mock';
+import { writeFileSync } from 'fs';
 
-//@ts-ignore
-const intraday = global.intraday;
+writeFileSync('./src/app/services/__tests__/intraday.generatedmock.js', `window.intraday = ${JSON.stringify(intraday)}`)
 
 describe("analysis service", () => {
 
