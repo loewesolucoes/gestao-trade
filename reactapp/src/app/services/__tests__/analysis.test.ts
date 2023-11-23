@@ -6,39 +6,33 @@ generateIMock();
 
 describe("analysis service", () => {
 
-  it("find tops and bottoms", () => {
+  it("run", () => {
     // check if all components are rendered
 
     //@ts-ignore
-    const result: any = analysisService.rw_extremes(intraday, 2)
-
-    const toposEFundos = result.tops.concat(result.bottoms).sort((x, y) => {
-      if (x.index < y.index)
-        return -1;
-
-      if (x.index > y.index)
-        return 1;
-
-      return 0;
-    }) as any[];
-
-    const toposEFundosCompleto = toposEFundos.reduce(((previous, next) => {
-      if (previous[previous.length - 1]?.type != next.type) {
-        previous.push(next);
-      }
-
-      return previous;
-    }), [] as any[]);
-
-    console.log(toposEFundosCompleto);
-
-    generateTFMock(toposEFundosCompleto);
+    const result: any = analysisService.run(intraday, new Date(2023, 1, 10).toISOString(), new Date(2023, 20, 10).toISOString())
 
     // console.log(result.tops);
 
     expect(result).not.toBeNull();
-    expect(toposEFundosCompleto.filter(x => x.type == "TOPO")).toHaveLength(3);
-    expect(toposEFundosCompleto.filter(x => x.type == "FUNDO")).toHaveLength(3);
+    expect(result.filter(x => x.type == "TOPO")).toHaveLength(4);
+    expect(result.filter(x => x.type == "FUNDO")).toHaveLength(4);
+  });
+
+
+  it("find tops and bottoms", () => {
+    // check if all components are rendered
+
+    //@ts-ignore
+    const result: any = analysisService.toposEFundos(intraday, 2)
+
+    generateTFMock(result);
+
+    // console.log(result.tops);
+
+    expect(result).not.toBeNull();
+    expect(result.filter(x => x.type == "TOPO")).toHaveLength(4);
+    expect(result.filter(x => x.type == "FUNDO")).toHaveLength(4);
   });
 });
 

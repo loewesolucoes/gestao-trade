@@ -27,7 +27,7 @@
           text: "Stock Price: AT&T Vs Verizon for 2016"
         },
         axisX: {
-          valueFormatString: "MMM"
+          valueFormatString: "DD"
         },
         axisY: {
           prefix: "$",
@@ -37,7 +37,7 @@
           {
             type: "candlestick",
             yValueFormatString: "$###0.00",
-            xValueFormatString: "MMM",
+            xValueFormatString: "DD",
             dataPoints: data.map(x => ({
               x: x.date,
               y: [x.open, x.max, x.min, x.close]
