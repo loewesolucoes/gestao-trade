@@ -19,14 +19,15 @@ class AnalysisService {
 
     const toposEFundos = this.toposEFundos(filteredHistory, 2);
     const movements = this.parseToMovements(toposEFundos);
-    console.log(movements);
+    console.log(JSON.stringify(movements));
     const movementsWithFibo = this.criarFiboEAlvos(movements);
 
     return movementsWithFibo;
   }
 
   private criarFiboEAlvos(toposEFundos: any[]) {
-    const lastDay = toposEFundos[toposEFundos.length - 1]?.data;
+    const lastMovements = toposEFundos[toposEFundos.length - 1]?.movements || [];
+    const lastDay = lastMovements[lastMovements.length - 1];
 
     return toposEFundos
       .map(x => {
@@ -69,19 +70,30 @@ class AnalysisService {
       .reduce(((previous, next) => {
         const last = previous[previous.length - 1];
 
-        if (next.type === TopBottomType.FUNDO || last == null) {
+        if (last == null) {
           previous.push({
-            ...next,
+            index: next.index,
+            order: next.order,
             movements: [next.data],
             movementType: MovementType.UNCOMPLETED,
-            type: undefined,
           });
-        } else if (next.type === TopBottomType.TOPO) {
-          previous[previous.length - 1] = {
-            ...last,
-            movements: [last.data, next.data],
-            movementType: last.data.min <= next.data.max ? MovementType.SUBIDA : MovementType.DESCIDA,
-            type: undefined,
+        } else {
+          const lastData = last.movements[last.movements.length - 1];
+
+          if (lastData.min <= next.data.min) {
+            previous.push({
+              index: last.index,
+              order: last.order,
+              movements: [lastData, next.data],
+              movementType: MovementType.SUBIDA,
+            });
+          } else {
+            previous.push({
+              index: last.index,
+              order: last.order,
+              movements: [lastData, next.data],
+              movementType: MovementType.DESCIDA,
+            });
           }
         }
 
