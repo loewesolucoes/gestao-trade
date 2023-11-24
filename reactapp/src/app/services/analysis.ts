@@ -18,7 +18,7 @@ class AnalysisService {
     const filteredHistory = historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate));
 
     const toposEFundos = this.toposEFundos(filteredHistory, 2);
-    const movements = this.parseToMovements(toposEFundos);
+    const movements = this.parseToMovementsTresPontos(toposEFundos);
     console.log(JSON.stringify(movements));
     const movementsWithFibo = this.criarFiboEAlvos(movements);
 
@@ -65,7 +65,43 @@ class AnalysisService {
       });
   }
 
-  private parseToMovements(history: any[]) {
+  // fazer parse dos movimentos baseado em tres pontos do grafico: FUNDO, TOPO, FUNDO
+  // comparar primeiro fundo com o proximo
+  // se estiver mais alto, é uma subida
+  // se estiver mais baixo é uma descida
+  private parseToMovementsTresPontos(history: any[]) {
+    return history
+      .reduce(((previous, next) => {
+        const last = previous[previous.length - 1];
+
+        if (last == null) {
+          previous.push({
+            index: next.index,
+            order: next.order,
+            movements: [next.data],
+            movementType: MovementType.UNCOMPLETED,
+          });
+        } else if (last.movements.length < 2) {
+          last.movements.push(next.data);
+        } else {
+          const firstData = last.movements[0];
+          
+          last.movements.push(next.data);
+          last.movementType = firstData.min <= next.data.min ? MovementType.SUBIDA : MovementType.DESCIDA;
+
+          previous.push({
+            index: next.index,
+            order: next.order,
+            movements: [next.data],
+            movementType: MovementType.UNCOMPLETED,
+          });
+        }
+
+        return previous;
+      }), [] as any[]);
+  }
+
+  private parseToMovementsDoisPontos(history: any[]) {
     return history
       .reduce(((previous, next) => {
         const last = previous[previous.length - 1];
