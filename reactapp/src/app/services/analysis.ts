@@ -12,17 +12,24 @@ export enum TopBottomType {
   FUNDO = "FUNDO"
 }
 
+export enum PivosType {
+  ALTA = "ALTA",
+  BAIXA = "BAIXA"
+}
+
 class AnalysisService {
   run(historyOriginal: StockHistory[], initialDate: string, endDate: string): any {
     if (historyOriginal.length === 0) return [];
     const filteredHistory = historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate));
 
     const toposEFundos = this.toposEFundos(filteredHistory, 2);
-    const movements = this.parseToMovementsTresPontos(toposEFundos);
-    console.log(JSON.stringify(movements));
-    const movementsWithFibo = this.criarFiboEAlvos(movements);
+    const movementsAlta = this.parseToMovementsTresPontos(toposEFundos, PivosType.ALTA);
+    const movementsBaixa = this.parseToMovementsTresPontos(toposEFundos, PivosType.BAIXA);
+    console.log(JSON.stringify(movementsAlta.concat(movementsBaixa)));
+    const movementsAltaWithFibo = this.criarFiboEAlvos(movementsAlta);
+    const movementsBaixaWithFibo = this.criarFiboEAlvos(movementsBaixa);
 
-    return movementsWithFibo;
+    return movementsAltaWithFibo.concat(movementsBaixaWithFibo);
   }
 
   private criarFiboEAlvos(toposEFundos: any[]) {
@@ -69,26 +76,37 @@ class AnalysisService {
   // comparar primeiro fundo com o proximo
   // se estiver mais alto, é uma subida
   // se estiver mais baixo é uma descida
-  private parseToMovementsTresPontos(history: any[]) {
+  private parseToMovementsTresPontos(history: any[], pivo: PivosType) {
     return history
       .reduce(((previous, next) => {
         const last = previous[previous.length - 1];
 
         if (last == null) {
-          previous.push({
-            index: next.index,
-            order: next.order,
-            movements: [next.data],
-            movementType: MovementType.UNCOMPLETED,
-          });
-        } else if (last.movements.length < 2) {
+          fillFirstInfo();
+        } else if (last.movements.length === 1) {
           last.movements.push(next.data);
+
+          if (previous.length === 1) {
+            if (pivo === PivosType.ALTA && next.type == TopBottomType.FUNDO) fillFirstInfo();
+            if (pivo === PivosType.BAIXA && next.type == TopBottomType.TOPO) fillFirstInfo();
+          }
+
         } else {
           const firstData = last.movements[0];
-          
-          last.movements.push(next.data);
-          last.movementType = firstData.min <= next.data.min ? MovementType.SUBIDA : MovementType.DESCIDA;
 
+          last.movements.push(next.data);
+
+          if (pivo === PivosType.BAIXA)
+            last.movementType = firstData.max <= next.data.max ? MovementType.SUBIDA : MovementType.DESCIDA;
+          else
+            last.movementType = firstData.min <= next.data.min ? MovementType.SUBIDA : MovementType.DESCIDA;
+
+          fillFirstInfo();
+        }
+
+        return previous;
+
+        function fillFirstInfo() {
           previous.push({
             index: next.index,
             order: next.order,
@@ -96,8 +114,6 @@ class AnalysisService {
             movementType: MovementType.UNCOMPLETED,
           });
         }
-
-        return previous;
       }), [] as any[]);
   }
 
@@ -172,7 +188,10 @@ class AnalysisService {
           index: i,
           order: i - order,
           date: data[i].date,
-          data: data[i],
+          data: {
+            ...data[i],
+            type: TopBottomType.TOPO,
+          },
           type: TopBottomType.TOPO,
         })
       }
@@ -182,7 +201,10 @@ class AnalysisService {
           index: i,
           order: i - order,
           date: data[i].date,
-          data: data[i],
+          data: {
+            ...data[i],
+            type: TopBottomType.FUNDO,
+          },
           type: TopBottomType.FUNDO,
         })
       }
