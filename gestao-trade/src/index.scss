@@ -33,3 +33,37 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.logo-link {
+  > svg {
+    width: 30px;
+    height: 30px;
+    
+    @include media-breakpoint-up(lg) {
+      width: 40px;
+      height: 40px;
+    }
+  }
+}
+
+footer {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+
+  a {
+    color: #000;
+
+    &:hover {
+      color: rgba(#000, 0.7);
+    }
+  }
+}

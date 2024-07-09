@@ -4,6 +4,7 @@ import './index.scss';
 import { Home } from './pages/home/home';
 import reportWebVitals from './reportWebVitals';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { AppProviders } from './contexts';
 
 const router = createBrowserRouter([
   {
@@ -15,9 +16,12 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AppProviders>
+      <RouterProvider router={router} />
+    </AppProviders>
   </React.StrictMode>
 );
 
