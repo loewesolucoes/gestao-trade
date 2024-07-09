@@ -27,7 +27,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "echo . > ./out/.nojekyll",
+    "predeploy": "echo . > ./build/.nojekyll",
     "deploy": "gh-pages -d build --dotfiles"
   },
   "eslintConfig": {
