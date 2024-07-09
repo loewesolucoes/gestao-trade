@@ -1,0 +1,4 @@
+export { Configuracoes } from './configuracoes/configuracoes'
+export { FAQ } from './faq/faq'
+export { Home } from './home/home'
+export { Relatorios } from './relatorios/relatorios'

@@ -1,18 +1,36 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.scss';
-import { Home } from './pages/home/home';
 import reportWebVitals from './reportWebVitals';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AppProviders } from './contexts';
+
+import { Home, Configuracoes, FAQ, Relatorios } from './pages';
+import { Acoes } from './pages/acoes/acoes';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
   },
+  {
+    path: "/acoes",
+    element: <Acoes />,
+  },
+  {
+    path: "/relatorios",
+    element: <Relatorios />,
+  },
+  {
+    path: "/configuracoes",
+    element: <Configuracoes />,
+  },
+  {
+    path: "/perguntas-frequentes",
+    element: <FAQ />,
+  },
 ], {
-  basename: process.env.PUBLIC_URL,
+  basename: process.env.NODE_ENV === 'development' ? '' : process.env.PUBLIC_URL,
 });
 
 const root = ReactDOM.createRoot(

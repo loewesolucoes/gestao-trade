@@ -17,7 +17,12 @@ BigNumber.config({
 
 moment().locale('pt-br')
 
-export function Layout({ children }: any) {
+interface CustomProps {
+  children: any
+}
+
+export function Layout({ children }: CustomProps) {
+
   return (
     <>
       <Header />

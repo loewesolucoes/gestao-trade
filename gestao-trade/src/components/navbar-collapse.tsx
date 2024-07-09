@@ -6,8 +6,8 @@ const pages = [
     path: '/'
   },
   {
-    name: 'Cotas',
-    path: '/cotas'
+    name: 'Ações',
+    path: '/acoes'
   },
   {
     name: 'Relatórios',
@@ -19,7 +19,7 @@ const pages = [
   },
   {
     name: 'Perguntas frequentes',
-    path: '/faq'
+    path: '/perguntas-frequentes'
   },
 ];
 
