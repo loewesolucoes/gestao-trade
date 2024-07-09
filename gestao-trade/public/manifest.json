@@ -2,7 +2,7 @@
   "id": "gestao-trade",
   "short_name": "Gestão de Trade",
   "name": "Gestão de Trade",
-  "start_url": "%PUBLIC_URL%/",
+  "start_url": ".",
   "icons": [
     {
       "src": "favicon.ico",
