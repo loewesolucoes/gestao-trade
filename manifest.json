@@ -1,0 +1,27 @@
+{
+  "id": "gestao-trade",
+  "short_name": "Gestão de Trade",
+  "name": "Gestão de Trade",
+  "start_url": ".",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "android-chrome-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "theme_color": "#65a246",
+  "background_color": "#65a246",
+  "display": "standalone",
+  "lang": "pt-br"
+}
