@@ -5,8 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AppProviders } from './contexts';
 
-import { Home, Configuracoes, FAQ, Relatorios } from './pages';
-import { Acoes } from './pages/acoes/acoes';
+import { Home, Configuracoes, FAQ, Relatorios, Acoes } from './pages';
 
 const router = createBrowserRouter([
   {

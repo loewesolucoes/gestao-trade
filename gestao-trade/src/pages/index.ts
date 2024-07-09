@@ -1,3 +1,4 @@
+export { Acoes } from './acoes/acoes'
 export { Configuracoes } from './configuracoes/configuracoes'
 export { FAQ } from './faq/faq'
 export { Home } from './home/home'
