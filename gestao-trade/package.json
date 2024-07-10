@@ -7,25 +7,26 @@
     "@testing-library/jest-dom": "5.17.0",
     "@testing-library/react": "13.4.0",
     "@testing-library/user-event": "13.5.0",
-    "@types/jest": "27.5.2",
-    "@types/node": "16.18.101",
-    "@types/react": "18.3.3",
-    "@types/react-dom": "18.3.0",
     "bignumber.js": "9.1.2",
     "bootstrap": "5.3.3",
+    "buffer": "6.0.3",
+    "extenso": "2.0.1",
+    "js-cookie": "3.0.5",
+    "localforage": "1.10.0",
     "moment": "2.30.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "6.24.1",
     "react-scripts": "5.0.1",
     "sass": "1.77.6",
+    "sql.js": "1.10.3",
     "typescript": "4.9.5",
     "web-vitals": "2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "predeploy": "echo . > ./build/.nojekyll",
     "deploy": "gh-pages -d build --dotfiles"
@@ -49,6 +50,17 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "7.1.0",
+    "@types/extenso": "2.0.4",
+    "@types/gapi": "0.0.47",
+    "@types/gapi.drive": "0.0.9",
+    "@types/google.accounts": "0.0.14",
+    "@types/jest": "27.5.2",
+    "@types/js-cookie": "3.0.6",
+    "@types/node": "16.18.101",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "@types/sql.js": "1.4.9",
     "gh-pages": "6.1.1"
   }
 }

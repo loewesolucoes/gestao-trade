@@ -29,7 +29,7 @@ const router = createBrowserRouter([
     element: <FAQ />,
   },
 ], {
-  basename: process.env.NODE_ENV === 'development' ? '' : process.env.PUBLIC_URL,
+  basename: process.env.PUBLIC_URL,
 });
 
 const root = ReactDOM.createRoot(

@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+public/sql-wasm.wasm
+public/worker.sql-wasm.js
+
 # testing
 /coverage
 
