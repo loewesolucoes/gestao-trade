@@ -4,21 +4,34 @@ import { Loader } from '../../components/loader';
 import { useEffect, useState } from 'react';
 import { useEnv } from '../../contexts/env';
 import { useStorage } from '../../contexts/storage';
+import { Parametro } from '../../repositories/parametros';
+import { Input } from '../../components/input';
 
 export function Configuracoes() {
   const [isLoading, setIsLoading] = useState(false);
   const { isDbOk, exportOriginalDumpToFileAndDownload, importOriginalDumpFromFile, repository } = useStorage();
   const { aplicationName } = useEnv()
   const [file, setFile] = useState<File>()
+  const [params, setParams] = useState<Parametro[]>([])
 
   useEffect(() => {
     document.title = `Configurações | ${process.env.REACT_APP_TITLE}`
   }, []);
 
   useEffect(() => {
-    console.log(repository.params);
-    
+    if (isDbOk) {
+      loadParams();
+    }
   }, [isDbOk]);
+
+  async function loadParams() {
+    setIsLoading(true);
+
+    const paramsDict = await repository.params.getDict();
+
+    setParams(Object.values(paramsDict));
+    setIsLoading(false);
+  }
 
   function handleChange(event: any) {
     setFile(event.target.files[0])
@@ -75,19 +88,28 @@ export function Configuracoes() {
                     {/* <AuthButton /> */}
                   </div>
                 </section>
+                <section className="card">
+                  <h5 className="card-header">Parâmetros</h5>
+                  <div className="card-body">
+                    <div className="flex-grow-1">
+                      <label htmlFor="chave" className="form-label">Nome chave: </label>
+                      <select className={`form-select`} id="chave" onChange={e => e}>
+                        <option>Escolha um parâmetro</option>
+                        {params.map(x => (
+                          <option key={x.chave} value={x.chave}>{x.chave}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex-grow-1">
+                      <label htmlFor="valor" className="form-label">Valor: </label>
+                      <Input type="text" className="form-control" id="valor" onChange={e => e} value={null} placeholder="Descrição" />
+                    </div>
+                  </div>
+                </section>
               </>
             )}
         </article>
       </main>
-    </Layout>
-  );
-
-  return (
-    <Layout>
-      <section className='container'>
-        <h1>Configurações</h1>
-        <p>Pagina em contrução</p>
-      </section>
     </Layout>
   );
 }

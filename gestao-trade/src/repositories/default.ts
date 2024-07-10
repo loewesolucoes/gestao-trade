@@ -1,7 +1,6 @@
 import BigNumber from "bignumber.js";
 import moment from "moment";
 import { RepositoryUtil } from "../utils/db-repository";
-import { ParametrosRepository } from "./parametros";
 
 export enum MapperTypes {
   DATE,
@@ -15,7 +14,7 @@ export enum TableNames {
   PARAMETROS = "parametros",
 }
 
-interface DefaultFields {
+export interface DefaultFields {
   id: number
   createdDate: Date
   updatedDate?: Date
@@ -35,11 +34,6 @@ export interface Acoes extends DefaultFields {
   active?: boolean
   setor?: string
   valorDeMercado?: BigNumber
-}
-
-export interface Parametros extends DefaultFields {
-  chave: string
-  valor?: string
 }
 
 const RUNNED_MIGRATION_CODE = 'runned';
@@ -74,7 +68,7 @@ export class DefaultRepository {
   public async list<T>(tableName: TableNames): Promise<T[]> {
     await Promise.resolve();
 
-    const result = this.db.exec(`SELECT strftime('%Y-%m', data) AS monthYear, * FROM ${tableName} order by data desc`);
+    const result = this.db.exec(`SELECT * FROM ${tableName} order by createdDate desc`);
 
     if (!Array.isArray(result))
       throw new Error(`${tableName} não encontrado (a)`);
@@ -200,6 +194,8 @@ export class DefaultRepository {
       this.db.exec(`CREATE TABLE IF NOT EXISTS "acoes" ("id" INTEGER NOT NULL,"nome" TEXT NOT NULL,"logo" TEXT NULL,"codigo" TEXT NULL, "tipo" INTEGER NULL, "active" INTEGER NULL, "valorDeMercado" REAL NULL, "setor" TEXT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
       migrations['acoes'] = RUNNED_MIGRATION_CODE;
     }
+
+    // TODO: Add parametros iniciais em branco
 
     const runnedMigrations = Object.keys(migrations).filter(x => migrations[x] === RUNNED_MIGRATION_CODE).reduce((p, n) => { p.push({ name: n, executedDate: new Date() }); return p; }, [] as any)
 
