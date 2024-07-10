@@ -12,7 +12,7 @@ export function Configuracoes() {
   const [file, setFile] = useState<File>()
 
   useEffect(() => {
-    document.title = `Configurações | ${process.env.NEXT_PUBLIC_TITLE}`
+    document.title = `Configurações | ${process.env.REACT_APP_TITLE}`
   }, []);
 
   function handleChange(event: any) {

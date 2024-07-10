@@ -1,8 +1,13 @@
 import logo from './logo.svg';
 import './home.scss';
 import { Layout } from '../../shared/layout';
+import { useEffect } from 'react';
 
 export function Home() {
+  useEffect(() => {
+    document.title = `Início | ${process.env.REACT_APP_TITLE}`
+  }, []);
+  
   return (
     <Layout>
       <div className="App">
