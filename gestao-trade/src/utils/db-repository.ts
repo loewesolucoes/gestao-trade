@@ -14,14 +14,39 @@ export enum MapperTypes {
 }
 
 export enum TableNames {
-  TRANSACOES = "transacoes",
-  PATRIMONIO = "patrimonio",
-  NOTAS = "notas",
-  METAS = "metas",
+  CONFIGURACOES = "configuracoes",
 }
 
-const DEFAULT_MAPPING = { data: MapperTypes.DATE_TIME, createdDate: MapperTypes.DATE_TIME, updatedDate: MapperTypes.DATE_TIME, monthYear: MapperTypes.IGNORE };
+const DEFAULT_MAPPING = { createdDate: MapperTypes.DATE_TIME, updatedDate: MapperTypes.DATE_TIME, monthYear: MapperTypes.IGNORE };
 const BUFFER_TYPE = 'base64';
+const RUNNED_MIGRATION_CODE = 'runned';
+
+interface DefaultFields {
+  id: number
+  createdDate: Date
+  updatedDate?: Date
+}
+
+enum StockType {
+  COMPANY = 1,
+  FII = 2,
+  ETFS = 3,
+  OTHERS = 4,
+}
+
+export interface Acoes extends DefaultFields {
+  nome?: string
+  codigo?: string
+  tipo?: StockType
+  active?: boolean
+  setor?: string
+  valorDeMercado?: BigNumber
+}
+
+export interface Parametros extends DefaultFields {
+  chave: string
+  valor?: string
+}
 
 export class DbRepository {
   public static readonly DB_NAME = 'gestao-trade.settings.db';
@@ -250,14 +275,22 @@ export class DbRepository {
   private async runMigrations() {
     await Promise.resolve();
 
-    const RUNNED_MIGRATION = 'runned';
-
     this.db.exec(`CREATE TABLE IF NOT EXISTS "migrations" ("id" INTEGER NOT NULL,"name" TEXT NULL DEFAULT NULL,"executedDate" DATETIME NULL,PRIMARY KEY ("id"));`);
 
     const result = this.db.exec('select * from "migrations"');
     const migrations = (this.parseSqlResultToObj(result)[0] || []).reduce((p, n) => { p[n.name] = n; return p; }, {} as any);
 
-    const runnedMigrations = Object.keys(migrations).filter(x => migrations[x] === RUNNED_MIGRATION).reduce((p, n) => { p.push({ name: n, executedDate: new Date() }); return p; }, [] as any)
+    if (migrations['parametros'] == null) {
+      this.db.exec(`CREATE TABLE IF NOT EXISTS "parametros" ("id" INTEGER NOT NULL,"chave" TEXT NOT NULL,"valor" TEXT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
+      migrations['parametros'] = RUNNED_MIGRATION_CODE;
+    }
+
+    if (migrations['acoes'] == null) {
+      this.db.exec(`CREATE TABLE IF NOT EXISTS "acoes" ("id" INTEGER NOT NULL,"nome" TEXT NOT NULL,"logo" TEXT NULL,"codigo" TEXT NULL, "tipo" INTEGER NULL, "active" INTEGER NULL, "valorDeMercado" REAL NULL, "setor" TEXT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
+      migrations['acoes'] = RUNNED_MIGRATION_CODE;
+    }
+
+    const runnedMigrations = Object.keys(migrations).filter(x => migrations[x] === RUNNED_MIGRATION_CODE).reduce((p, n) => { p.push({ name: n, executedDate: new Date() }); return p; }, [] as any)
 
     let allParams = {};
     let fullCommand = '';
