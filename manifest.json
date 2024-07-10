@@ -1,7 +1,7 @@
 {
   "id": "gestao-trade",
-  "short_name": "Gestão de Trade",
-  "name": "Gestão de Trade",
+  "short_name": "Gestão de trading",
+  "name": "Gestão de trading",
   "start_url": ".",
   "icons": [
     {
