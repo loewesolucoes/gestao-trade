@@ -4,10 +4,16 @@
 import React, { createContext, useState, useEffect } from "react"
 import { useAuth } from "./auth";
 import { GDriveUtil } from "../utils/gdrive";
-import { DbRepository } from "../utils/db-repository";
+import { RepositoryUtil } from "../utils/db-repository";
+import { DefaultRepository } from "../repositories/default";
+import { ParametrosRepository } from "../repositories/parametros";
+
+interface Repo extends DefaultRepository {
+  params: ParametrosRepository
+}
 
 interface StorageProviderContext {
-  repository: DbRepository
+  repository: Repo
   isDbOk: boolean
   isGDriveSaveLoading: boolean
   isGDriveLoadLoading: boolean
@@ -30,13 +36,8 @@ const StorageContext = createContext<StorageProviderContext>({
   refresh: () => Promise.resolve(),
 });
 
-export enum AvailableCollections {
-  default = "default",
-  simulador = "simulador",
-}
-
 export function StorageProvider(props: any) {
-  const [repository, setRepository] = useState<DbRepository>({} as any);
+  const [repository, setRepository] = useState<Repo>({} as any);
   const [isDbOk, setIsDbOk] = useState<boolean>(false);
   const [isGDriveSaveLoading, setIsGDriveSaveLoading] = useState<boolean>(false);
   const [isGDriveLoadLoading, setIsGDriveLoadLoading] = useState<boolean>(false);
@@ -50,7 +51,10 @@ export function StorageProvider(props: any) {
     console.log('startStorage');
     setIsDbOk(false);
 
-    const repository = await DbRepository.create(data);
+    const repository = await RepositoryUtil.create(data) as Repo;
+
+    // @ts-ignore
+    repository.params = new ParametrosRepository(repository.db);
 
     setRepository(repository);
     setIsDbOk(true);
@@ -150,13 +154,13 @@ export function StorageProvider(props: any) {
       const fileData = await GDriveUtil.getFileById(file.id);
       const dump = fileData?.body;
 
-      await DbRepository.persistLocalDump(dump);
+      await RepositoryUtil.persistLocalDump(dump);
       await startStorage()
     }
   }
 
   async function updateGDrive() {
-    const dump = await DbRepository.exportLocalDump();
+    const dump = await RepositoryUtil.exportLocalDump();
 
     console.info('updateGDrive');
 

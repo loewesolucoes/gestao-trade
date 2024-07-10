@@ -7,13 +7,18 @@ import { useStorage } from '../../contexts/storage';
 
 export function Configuracoes() {
   const [isLoading, setIsLoading] = useState(false);
-  const { isDbOk, exportOriginalDumpToFileAndDownload, importOriginalDumpFromFile } = useStorage();
+  const { isDbOk, exportOriginalDumpToFileAndDownload, importOriginalDumpFromFile, repository } = useStorage();
   const { aplicationName } = useEnv()
   const [file, setFile] = useState<File>()
 
   useEffect(() => {
     document.title = `Configurações | ${process.env.REACT_APP_TITLE}`
   }, []);
+
+  useEffect(() => {
+    console.log(repository.params);
+    
+  }, [isDbOk]);
 
   function handleChange(event: any) {
     setFile(event.target.files[0])
