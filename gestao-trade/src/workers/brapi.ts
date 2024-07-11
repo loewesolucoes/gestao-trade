@@ -21,7 +21,7 @@ async function loadAll(data: GestaoMessage) {
 
   const { stocks } = (await res.json() as BrapiResponse);
 
-  const acoes = stocks.map(x => ({
+  const acoesResponse = stocks.map(x => ({
     nome: x.name,
     codigo: x.stock,
     tipo: x.sector != null ? 1 : 4, // TODO: Add enum
@@ -31,9 +31,11 @@ async function loadAll(data: GestaoMessage) {
     setor: x.sector,
   }))
 
-  console.log(await dbWorker.exec('select * from acoes'));
+  const acoes = await dbWorker.exec('select * from acoes');
 
-  self.postMessage({ id: data.id, response: acoes });
+  console.log(acoes);
+
+  self.postMessage({ id: data.id, response: acoesResponse });
 }
 
 console.debug('brapi-worker end');

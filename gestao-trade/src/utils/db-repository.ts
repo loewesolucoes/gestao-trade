@@ -10,7 +10,7 @@ export class GestaoDatabase {
   private readonly onMessages: { [key: string]: (event: MessageEvent) => void } = {};
 
   constructor() {
-    this.worker = new Worker(new URL("../workers/database.ts", import.meta.url));
+    this.worker = new Worker(new URL("../workers/database-broadcast.ts", import.meta.url));
     this.worker.onerror = e => console.log("Worker error: ", e);
     this.worker.onmessage = (event) => {
       const { id } = event.data;
@@ -32,7 +32,7 @@ export class GestaoDatabase {
 
     return new Promise((resolve, reject) => {
       this.onMessages[nextId] = event => {
-        console.debug('onmessage', event.data.id, nextId, event);
+        console.debug('GestaoDatabase.onmessage', event.data.id, nextId, event);
 
         if (event.data.id === nextId) {
           if (event.data.error)
@@ -42,7 +42,7 @@ export class GestaoDatabase {
         }
       };
 
-      console.debug('sending', 'exec', nextId, sql, params);
+      console.debug('GestaoDatabase.sending', 'exec', nextId, sql, params);
 
       this.worker.postMessage({
         id: nextId,
@@ -58,7 +58,7 @@ export class GestaoDatabase {
 
     return new Promise((resolve, reject) => {
       this.onMessages[nextId] = event => {
-        console.debug('onmessage', event.data.id, nextId, event);
+        console.debug('GestaoDatabase.onmessage', event.data.id, nextId, event);
         if (event.data.id === nextId) {
           if (event.data.error)
             reject(event.data);
@@ -67,7 +67,7 @@ export class GestaoDatabase {
         }
       };
 
-      console.debug('sending', 'export', nextId);
+      console.debug('GestaoDatabase.sending', 'export', nextId);
 
       this.worker.postMessage({
         id: nextId,
@@ -81,7 +81,7 @@ export class GestaoDatabase {
 
     return new Promise((resolve, reject) => {
       this.onMessages[nextId] = event => {
-        console.debug('onmessage', event.data.id, nextId, event);
+        console.debug('GestaoDatabase.onmessage', event.data.id, nextId, event);
         if (event.data.id === nextId) {
           if (event.data.error)
             reject(event.data);
@@ -90,7 +90,7 @@ export class GestaoDatabase {
         }
       };
 
-      console.debug('sending', 'open', nextId);
+      console.debug('GestaoDatabase.sending', 'open', nextId);
 
       this.worker.postMessage({
         id: nextId,

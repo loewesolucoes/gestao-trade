@@ -60,7 +60,7 @@ export class DBWorkerUtil {
         }
       };
 
-      console.debug('sending', 'exec', nextId, sql, params);
+      console.debug('DBWorkerUtil.sending', 'exec', nextId, sql, params);
 
       DBWorkerUtil.broadcastSend.postMessage({
         id: nextId,
