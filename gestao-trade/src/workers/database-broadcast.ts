@@ -1,7 +1,7 @@
 import { GestaoMessage } from "./common";
 import { DBWorkerUtil } from "./db-worker-util";
 
-console.log('database-broadcast-worker start');
+console.debug('database-broadcast-worker start');
 
 const worker = new Worker(`${process.env.PUBLIC_URL}/worker.sql-wasm.js`);
 
@@ -30,6 +30,6 @@ self.onmessage = (event: MessageEvent<GestaoMessage>) => {
   worker.postMessage(event.data);
 };
 
-console.log('database-broadcast-worker end');
+console.debug('database-broadcast-worker end');
 
 export { };
