@@ -1,9 +1,10 @@
-import { DB_CHANNEL, GestaoMessage, WorkersActions } from "./common";
+import { DB_CHANNEL_SEND, GestaoMessage, WorkersActions } from "./common";
+import { DBWorkerUtil } from "./db-worker-util";
 
 /* eslint-disable no-restricted-globals */
 console.debug('brapi-worker start');
 
-const databaseBroadcast = new BroadcastChannel(DB_CHANNEL);
+const dbWorker = new DBWorkerUtil('brapi');
 
 self.onmessage = (event: MessageEvent<GestaoMessage>) => {
   console.debug('brapi.onmessage', event);
@@ -30,11 +31,7 @@ async function loadAll(data: GestaoMessage) {
     setor: x.sector,
   }))
 
-  databaseBroadcast.postMessage({
-    id: 'sw-brapi-',
-    action: 'exec',
-    sql: 'select * from table',
-  })
+  console.log(await dbWorker.exec('select * from acoes'));
 
   self.postMessage({ id: data.id, response: acoes });
 }

@@ -14,9 +14,6 @@ export class GestaoDatabase {
     this.worker.onerror = e => console.log("Worker error: ", e);
     this.worker.onmessage = (event) => {
       const { id } = event.data;
-
-      if (id?.startsWith('sw')) return;
-
       const action = this.onMessages[id];
 
       if (action == null) {
