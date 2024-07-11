@@ -11,9 +11,13 @@ export function IntegrationProvider(props: any) {
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    brapiService.loadAll();
-    setIsRunning(false);
+    load();
   }, []);
+
+  async function load() {
+    await brapiService.loadAll();
+    setIsRunning(false);
+  }
 
   return (
     <IntegrationContext.Provider
