@@ -48,7 +48,7 @@ export function StorageProvider(props: any) {
   }, []);
 
   async function startStorage(data?: ArrayLike<number> | Buffer | null) {
-    console.log('startStorage');
+    console.debug('startStorage');
     setIsDbOk(false);
 
     const repository = await RepositoryUtil.create(data) as Repo;
@@ -60,19 +60,19 @@ export function StorageProvider(props: any) {
 
     setRepository(repository);
     setIsDbOk(true);
-    console.log('startStorage isDbOk');
+    console.debug('startStorage isDbOk');
 
     return repository;
   }
 
   async function refresh() {
     return new Promise<void>(resolve => {
-      console.log('refresh');
+      console.debug('refresh');
       setIsDbOk(false);
 
       setTimeout(() => {
         setIsDbOk(true);
-        console.log('refresh isDbOk');
+        console.debug('refresh isDbOk');
         resolve();
       }, 100);
     })
@@ -116,7 +116,7 @@ export function StorageProvider(props: any) {
       return;
 
     setIsGDriveSaveLoading(true);
-    console.log('doGDriveSave start');
+    console.debug('doGDriveSave start');
 
     if (!isAuthOk)
       throw new Error('you must login on gdrive')
@@ -125,7 +125,7 @@ export function StorageProvider(props: any) {
 
     alert('Dados salvos no Google Drive');
 
-    console.log('doGDriveSave end');
+    console.debug('doGDriveSave end');
     setIsGDriveSaveLoading(false);
   }
 
@@ -134,23 +134,23 @@ export function StorageProvider(props: any) {
       return;
 
     setIsGDriveLoadLoading(true);
-    console.log('doGDriveLoad start');
+    console.debug('doGDriveLoad start');
     if (!isAuthOk)
       throw new Error('you must login on gdrive')
 
     await loadGDrive();
-    console.log('doGDriveLoad end');
+    console.debug('doGDriveLoad end');
     await refresh();
     alert('Dados carregados do Google Drive');
     setIsGDriveLoadLoading(false);
   }
 
   async function loadGDrive() {
-    console.log('loadGDrive');
+    console.debug('loadGDrive');
 
     const file = await GDriveUtil.getFirstFileByName(GDriveUtil.DB_FILE_NAME);
 
-    console.log("file", file);
+    console.debug("file", file);
 
     if (file) {
       const fileData = await GDriveUtil.getFileById(file.id);
@@ -164,7 +164,7 @@ export function StorageProvider(props: any) {
   async function updateGDrive() {
     const dump = await RepositoryUtil.exportLocalDump();
 
-    console.info('updateGDrive');
+    console.debug('updateGDrive');
 
     const file = await GDriveUtil.getFirstFileByName(GDriveUtil.DB_FILE_NAME);
 

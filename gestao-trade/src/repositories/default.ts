@@ -225,7 +225,7 @@ export class DefaultRepository {
     const dump = await this.exportDump();
 
     await RepositoryUtil.persistLocalDump(dump)
-    console.info("persistDb ok");
+    console.debug("persistDb ok");
   }
 
   private async exportDump() {
