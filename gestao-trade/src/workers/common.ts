@@ -1,5 +1,6 @@
 export enum WorkersActions {
-  LOAD_ALL = "loadAll"
+  LOAD_ALL = "loadAll",
+  CONNECT = "connect",
 }
 
 
@@ -8,3 +9,6 @@ export interface GestaoMessage {
   action: WorkersActions;
   params: any;
 }
+
+
+export const DB_CHANNEL = 'gestao-database-channel';

@@ -1,18 +1,19 @@
-import { GestaoMessage, WorkersActions } from "./common";
+import { DB_CHANNEL, GestaoMessage, WorkersActions } from "./common";
 
 /* eslint-disable no-restricted-globals */
+console.debug('brapi-worker start');
 
-self.onmessage = (e: MessageEvent<GestaoMessage>) => {
-  console.debug('brapi.onmessage', e);
+const databaseBroadcast = new BroadcastChannel(DB_CHANNEL);
 
-  switch (e.data.action) {
+self.onmessage = (event: MessageEvent<GestaoMessage>) => {
+  console.debug('brapi.onmessage', event);
+
+  switch (event.data.action) {
     case WorkersActions.LOAD_ALL: {
-      loadAll(e.data);
+      loadAll(event.data);
     }
   }
 };
-
-export { };
 
 async function loadAll(data: GestaoMessage) {
   const res = await fetch('https://brapi.dev/api/quote/list')
@@ -29,10 +30,18 @@ async function loadAll(data: GestaoMessage) {
     setor: x.sector,
   }))
 
+  databaseBroadcast.postMessage({
+    id: 'sw-brapi-',
+    action: 'exec',
+    sql: 'select * from table',
+  })
 
   self.postMessage({ id: data.id, response: acoes });
 }
 
+console.debug('brapi-worker end');
+
+export { };
 
 export interface BrapiResponse {
   indexes: BrapiIndex[];

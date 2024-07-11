@@ -10,11 +10,12 @@ export class GestaoDatabase {
   private readonly onMessages: { [key: string]: (event: MessageEvent) => void } = {};
 
   constructor() {
-    this.worker = new Worker(`${process.env.PUBLIC_URL}/worker.sql-wasm.js`);
-
+    this.worker = new Worker(new URL("../workers/database.ts", import.meta.url));
     this.worker.onerror = e => console.log("Worker error: ", e);
     this.worker.onmessage = (event) => {
       const { id } = event.data;
+
+      if (id?.startsWith('sw')) return;
 
       const action = this.onMessages[id];
 

@@ -1,3 +1,4 @@
+import { GestaoDatabase } from "../utils/db-repository";
 import { WorkersActions } from "../workers/common";
 
 export class WorkerService {
