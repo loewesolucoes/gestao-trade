@@ -40,7 +40,7 @@ const RUNNED_MIGRATION_CODE = 'runned';
 const DEFAULT_MAPPING = { createdDate: MapperTypes.DATE_TIME, updatedDate: MapperTypes.DATE_TIME, monthYear: MapperTypes.IGNORE };
 
 export class DefaultRepository {
-  public constructor(private db: Database) { }
+  public constructor(protected db: Database) { }
 
   public async save(tableName: TableNames, data: any) {
     let result = {} as any;

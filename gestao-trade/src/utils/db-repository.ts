@@ -7,27 +7,44 @@ const BUFFER_TYPE = 'base64';
 export class Database {
   private currentId = 0;
   private readonly worker: Worker;
+  private readonly onMessages: { [key: string]: (event: MessageEvent) => void } = {};
 
   constructor() {
     this.worker = new Worker(`${process.env.PUBLIC_URL}/worker.sql-wasm.js`);
 
     this.worker.onerror = e => console.log("Worker error: ", e);
+    this.worker.onmessage = (event) => {
+      const { id } = event.data;
+
+      const action = this.onMessages[id];
+
+      if (action == null) {
+        console.error('invalid message id', id, event);
+
+        throw new Error(`invalid message id => ${id}`);
+      }
+
+      action(event);
+      delete this.onMessages[id];
+    }
   }
 
   public async exec(sql: string, params?: any): Promise<initSqlJs.QueryExecResult[]> {
     const nextId = `exec-${this.currentId++}`;
 
     return new Promise((resolve, reject) => {
-      this.worker.onmessage = event => {
-        console.log(event); // The result of the query
+      this.onMessages[nextId] = event => {
+        console.debug('onmessage', event.data.id, nextId, event);
 
-        console.log(event.data.id, nextId);
-
-        if (event.data.id === nextId)
-          resolve(event.data.results);
+        if (event.data.id === nextId) {
+          if (event.data.error)
+            reject(event.data);
+          else
+            resolve(event.data.results);
+        }
       };
 
-      console.log('sending', sql, params);
+      console.debug('sending', 'exec', nextId, sql, params);
 
       this.worker.postMessage({
         id: nextId,
@@ -42,14 +59,17 @@ export class Database {
     const nextId = `export-${this.currentId++}`;
 
     return new Promise((resolve, reject) => {
-      this.worker.onmessage = event => {
-        console.log(event); // The result of the query
-        console.log(event.data.id, nextId);
-        if (event.data.id === nextId)
-          resolve(event.data.buffer);
+      this.onMessages[nextId] = event => {
+        console.debug('onmessage', event.data.id, nextId, event);
+        if (event.data.id === nextId) {
+          if (event.data.error)
+            reject(event.data);
+          else
+            resolve(event.data.buffer);
+        }
       };
 
-      console.log('sending', 'export');
+      console.debug('sending', 'export', nextId);
 
       this.worker.postMessage({
         id: nextId,
@@ -62,14 +82,17 @@ export class Database {
     const nextId = `open-${this.currentId++}`;
 
     return new Promise((resolve, reject) => {
-      this.worker.onmessage = event => {
-        console.log(event); // The result of the query
-        console.log(event.data.id, nextId);
-        if (event.data.id === nextId)
-          resolve(event.data);
+      this.onMessages[nextId] = event => {
+        console.debug('onmessage', event.data.id, nextId, event);
+        if (event.data.id === nextId) {
+          if (event.data.error)
+            reject(event.data);
+          else
+            resolve(event.data);
+        }
       };
 
-      console.log('sending', 'open');
+      console.debug('sending', 'open', nextId);
 
       this.worker.postMessage({
         id: nextId,
