@@ -1,5 +1,6 @@
 import { AuthProvider } from "./auth"
 import { EnvProvider } from "./env"
+import { IntegrationProvider } from "./integration"
 import { StorageProvider } from "./storage"
 
 export function AppProviders({ children }: any) {
@@ -7,7 +8,9 @@ export function AppProviders({ children }: any) {
     <EnvProvider>
       <AuthProvider>
         <StorageProvider>
-          {children}
+          <IntegrationProvider>
+            {children}
+          </IntegrationProvider>
         </StorageProvider>
       </AuthProvider>
     </EnvProvider>

@@ -54,7 +54,9 @@ export function StorageProvider(props: any) {
     const repository = await RepositoryUtil.create(data) as Repo;
 
     // @ts-ignore
-    repository.params = new ParametrosRepository(repository.db);
+    const sqldb = repository.db;
+    
+    repository.params = new ParametrosRepository(sqldb);
 
     setRepository(repository);
     setIsDbOk(true);
