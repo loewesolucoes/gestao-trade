@@ -9,10 +9,11 @@ import { Input } from '../../components/input';
 
 export function Configuracoes() {
   const [isLoading, setIsLoading] = useState(false);
-  const { isDbOk, exportOriginalDumpToFileAndDownload, importOriginalDumpFromFile, repository } = useStorage();
+  const { isDbOk, exportOriginalDumpToFileAndDownload, importOriginalDumpFromFile, repository, refresh } = useStorage();
   const { aplicationName } = useEnv()
   const [file, setFile] = useState<File>()
   const [params, setParams] = useState<Parametro[]>([])
+  const [currentParam, setCurrentParam] = useState<Parametro>()
 
   useEffect(() => {
     document.title = `Configurações | ${process.env.REACT_APP_TITLE}`
@@ -54,6 +55,18 @@ export function Configuracoes() {
     setIsLoading(false);
   }
 
+  async function saveParam(currentParam?: Parametro) {
+    if (currentParam == null)
+      return alert('Parâmetro invalido.');
+
+    setIsLoading(true);
+    await repository.params.set(currentParam.chave, currentParam.valor);
+    setCurrentParam(undefined);
+
+    await refresh();
+    setIsLoading(false);
+  }
+
   const isAllLoading = isLoading || !isDbOk
 
   return (
@@ -90,20 +103,25 @@ export function Configuracoes() {
                 </section>
                 <section className="card">
                   <h5 className="card-header">Parâmetros</h5>
-                  <div className="card-body">
+                  <div className="card-body d-flex flex-column gap-3">
                     <div className="flex-grow-1">
                       <label htmlFor="chave" className="form-label">Nome chave: </label>
-                      <select className={`form-select`} id="chave" onChange={e => e}>
+                      <select className={`form-select`} id="chave" onChange={e => setCurrentParam(params[e.target.value])}>
                         <option>Escolha um parâmetro</option>
-                        {params.map(x => (
-                          <option key={x.chave} value={x.chave}>{x.chave}</option>
+                        {params.map((x, i) => (
+                          <option key={x.chave} value={i}>{x.chave}</option>
                         ))}
                       </select>
                     </div>
-                    <div className="flex-grow-1">
-                      <label htmlFor="valor" className="form-label">Valor: </label>
-                      <Input type="text" className="form-control" id="valor" onChange={e => e} value={null} placeholder="Descrição" />
-                    </div>
+                    {currentParam && (
+                      <>
+                        <div className="flex-grow-1">
+                          <label htmlFor="valor" className="form-label">Valor: </label>
+                          <Input type="text" className="form-control" id="valor" onChange={x => setCurrentParam({ ...currentParam, valor: x } as any)} value={currentParam?.valor} placeholder="Descrição" />
+                        </div>
+                        <button type="button" className="btn btn-secondary w-100" onClick={e => saveParam(currentParam)}>Salvar</button>
+                      </>
+                    )}
                   </div>
                 </section>
               </>

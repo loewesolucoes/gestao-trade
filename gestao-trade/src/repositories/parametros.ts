@@ -5,14 +5,30 @@ export interface Parametro extends DefaultFields {
   valor?: string
 }
 
+const BRAPI_KEY = 'BRAPI_API_KEY';
+
 export class ParametrosRepository extends DefaultRepository {
   private _paramsDict?: { [key: string]: Parametro };
 
   public async getDict(): Promise<{ [key: string]: Parametro }> {
-    if (this._paramsDict == null)
-      this._paramsDict = (await this.list<Parametro>(TableNames.PARAMETROS)).reduce((p, n) => { p[n.chave] = n; return p; }, {});
+    if (this._paramsDict == null) {
+      this._paramsDict = await this.loadParamsOrDefault();
+    }
 
     return this._paramsDict;
+  }
+
+  private async loadParamsOrDefault() {
+    const params = (await this.list<Parametro>(TableNames.PARAMETROS)).reduce((p, n) => { p[n.chave] = n; return p; }, {});
+    const nextParams = {} as { [key: string]: Parametro };
+
+    nextParams[BRAPI_KEY] = params[BRAPI_KEY] || { chave: BRAPI_KEY, valor: '' };
+
+    const newParams = Object.keys(nextParams).map(x => nextParams[x]).filter(x => x.id == null);
+
+    await Promise.all(newParams.map(x => this.save(TableNames.PARAMETROS, x)));
+
+    return nextParams;
   }
 
   public async getByKey(chave: string): Promise<Parametro> {
@@ -23,13 +39,16 @@ export class ParametrosRepository extends DefaultRepository {
     return (await this.getDict())[chave]?.valor;
   }
 
-  public async set(chave: string, valor: string) {
-    let param = this.getDict()[chave];
+  public async set(chave: string, valor?: string) {
+    let param = (await this.getDict())[chave];
 
     if (param == null)
-      param = {};
+      param = {} as any;
 
-    await this.save(TableNames.PARAMETROS, { ...param, chave, valor });
+    const result = await this.save(TableNames.PARAMETROS, { ...param, chave, valor });
+
     delete this._paramsDict;
+
+    return result;
   }
 }

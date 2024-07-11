@@ -46,9 +46,9 @@ export class DefaultRepository {
     let result = {} as any;
 
     if (data?.id != null)
-      result = this.update(tableName, data)
+      result = await this.update(tableName, data)
     else
-      result = this.insert(tableName, data);
+      result = await this.insert(tableName, data);
 
     await this.persistDb();
 
@@ -91,7 +91,7 @@ export class DefaultRepository {
     const { command, params, nextData } = this.createInsertCommand(tableName, data);
     const fullCommand = `${command};SELECT LAST_INSERT_ROWID();`
 
-    const result = this.db.exec(fullCommand, params);
+    const result = await this.db.exec(fullCommand, params);
 
     nextData.id = result[0].values[0][0];
 
