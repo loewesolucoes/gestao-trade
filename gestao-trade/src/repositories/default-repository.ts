@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import moment from "moment";
-import { Database, RepositoryUtil } from "../utils/db-repository";
+import { GestaoDatabase, RepositoryUtil } from "../utils/db-repository";
 
 export enum MapperTypes {
   DATE,
@@ -30,6 +30,7 @@ enum StockType {
 export interface Acoes extends DefaultFields {
   nome?: string
   codigo?: string
+  logo?: string
   tipo?: StockType
   active?: boolean
   setor?: string
@@ -40,7 +41,7 @@ const RUNNED_MIGRATION_CODE = 'runned';
 const DEFAULT_MAPPING = { createdDate: MapperTypes.DATE_TIME, updatedDate: MapperTypes.DATE_TIME, monthYear: MapperTypes.IGNORE };
 
 export class DefaultRepository {
-  public constructor(protected db: Database) { }
+  public constructor(protected db: GestaoDatabase) { }
 
   public async save(tableName: TableNames, data: any) {
     let result = {} as any;

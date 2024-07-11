@@ -1,15 +1,17 @@
 "use client";
 
 import React, { createContext, useState, useEffect } from "react"
+import { brapiService } from "../services/brapi";
 
 const IntegrationContext = createContext({
   isRunning: true,
-})
+});
 
 export function IntegrationProvider(props: any) {
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
+    brapiService.loadAll();
     setIsRunning(false);
   }, []);
 

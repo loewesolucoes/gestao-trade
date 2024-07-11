@@ -5,7 +5,7 @@ import React, { createContext, useState, useEffect } from "react"
 import { useAuth } from "./auth";
 import { GDriveUtil } from "../utils/gdrive";
 import { RepositoryUtil } from "../utils/db-repository";
-import { DefaultRepository } from "../repositories/default";
+import { DefaultRepository } from "../repositories/default-repository";
 import { ParametrosRepository } from "../repositories/parametros";
 
 interface Repo extends DefaultRepository {

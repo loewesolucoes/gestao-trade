@@ -1,10 +1,10 @@
 import localforage from 'localforage'
 import { Buffer } from 'buffer';
-import { DefaultRepository } from '../repositories/default';
+import { DefaultRepository } from '../repositories/default-repository';
 
 const BUFFER_TYPE = 'base64';
 
-export class Database {
+export class GestaoDatabase {
   private currentId = 0;
   private readonly worker: Worker;
   private readonly onMessages: { [key: string]: (event: MessageEvent) => void } = {};
@@ -113,7 +113,7 @@ export class RepositoryUtil {
       data = Buffer.from(localDump, BUFFER_TYPE);
     }
 
-    const db = new Database();
+    const db = new GestaoDatabase();
 
     await db.open(data);
 
