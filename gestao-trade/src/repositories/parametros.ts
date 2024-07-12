@@ -20,7 +20,7 @@ export class ParametrosRepository extends DefaultRepository {
 
   private async loadParamsOrDefault() {
     const params = (await this.list<Parametro>(TableNames.PARAMETROS)).reduce((p, n) => { p[n.chave] = n; return p; }, {});
-    const nextParams = {} as { [key: string]: Parametro };
+    const nextParams = params;
 
     nextParams[BRAPI_KEY] = params[BRAPI_KEY] || { chave: BRAPI_KEY, valor: '' };
 
@@ -40,7 +40,8 @@ export class ParametrosRepository extends DefaultRepository {
   }
 
   public async set(chave: string, valor?: string) {
-    let param = (await this.getDict())[chave];
+    const paramsDict = await this.getDict();
+    let param = paramsDict[chave];
 
     if (param == null)
       param = {} as any;

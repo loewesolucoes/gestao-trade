@@ -3,12 +3,16 @@ import { Acoes, AcoesRepository, StockType } from "../repositories/acoes";
 import { TableNames } from "../repositories/default-repository";
 import { GestaoMessage, WorkersActions } from "./common";
 import { WorkerDatabase } from "./worker-database";
+import { ParametrosRepository } from "../repositories/parametros";
+import moment from "moment";
 
 /* eslint-disable no-restricted-globals */
 console.debug('brapi-worker start');
 
+const BRAPI_LAST_UPDATE_KEY = 'BRAPI_LAST_UPDATE';
 const dbWorker = new WorkerDatabase('brapi');
 const repository = new AcoesRepository(dbWorker);
+const paramsRepository = new ParametrosRepository(dbWorker);
 
 self.onmessage = (event: MessageEvent<GestaoMessage>) => {
   console.debug('brapi.onmessage', event);
@@ -21,7 +25,25 @@ self.onmessage = (event: MessageEvent<GestaoMessage>) => {
 };
 
 async function loadAll(data: GestaoMessage) {
-  const res = await fetch('https://brapi.dev/api/quote/list')
+  const lastUpdateParam = await paramsRepository.getByKey(BRAPI_LAST_UPDATE_KEY)
+  const lastUpdate = moment(lastUpdateParam?.valor);
+  const passou14Dias = moment(new Date()).add(-14, "days").isSameOrAfter(lastUpdate);
+
+  if (lastUpdateParam == null || passou14Dias) {
+    console.debug('calling brapi');
+    
+    await loadAllAndSave();
+    await paramsRepository.set(BRAPI_LAST_UPDATE_KEY, moment(new Date()).toISOString());
+
+    console.debug('end calling brapi');
+  } else console.debug('not needed to call brapi;')
+
+
+  self.postMessage({ id: data.id, response: { success: true } });
+}
+
+async function loadAllAndSave() {
+  const res = await fetch('https://brapi.dev/api/quote/list');
 
   const { stocks } = (await res.json() as BrapiResponse);
 
@@ -35,14 +57,14 @@ async function loadAll(data: GestaoMessage) {
     setor: x.sector,
   }));
 
-  const acoesASalvar: Acoes[] = []
+  const acoesASalvar: Acoes[] = [];
   const acoes = await repository.list<Acoes>(TableNames.ACOES);
 
   const acoesDict = acoesToDict(acoes);
 
   for (let index = 0; index < acoesReponse.length; index++) {
     const acaoAtual = acoesReponse[index];
-    const acaoDoDB = acoesDict[acaoAtual.codigo] || {} as Acoes
+    const acaoDoDB = acoesDict[acaoAtual.codigo] || {} as Acoes;
 
     acaoDoDB.active = acaoAtual.active;
     acaoDoDB.codigo = acaoAtual.codigo;
@@ -55,11 +77,8 @@ async function loadAll(data: GestaoMessage) {
     acoesASalvar.push(acaoDoDB);
   }
 
-  console.log(acoes);
-
   await repository.saveAll(TableNames.ACOES, acoesASalvar);
-
-  self.postMessage({ id: data.id, response: acoesReponse });
+  return acoesReponse;
 }
 
 function acoesToDict(acoesReponse: Acoes[]): { [key: string]: Acoes } {
