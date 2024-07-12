@@ -1,11 +1,11 @@
 import { GestaoMessage } from "./common";
-import { DBWorkerUtil } from "./db-worker-util";
+import { WorkerDatabase } from "./worker-database";
 
 console.debug('database-broadcast-worker start');
 
 const worker = new Worker(`${process.env.PUBLIC_URL}/worker.sql-wasm.js`);
 
-DBWorkerUtil.setOnMessage(event => {
+WorkerDatabase.setOnMessage(event => {
   console.debug('database-broadcast.onmessage', event);
 
   worker.postMessage(event.data);
@@ -18,7 +18,7 @@ worker.onmessage = (event) => {
   console.debug('database-broadcast.onmessage', event);
 
   if (event.data.id?.startsWith('sw-')) {
-    DBWorkerUtil.postReceive(event);
+    WorkerDatabase.postReceive(event);
   } else {
     self.postMessage(event.data);
   }

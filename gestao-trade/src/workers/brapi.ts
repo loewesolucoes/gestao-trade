@@ -1,10 +1,14 @@
-import { DB_CHANNEL_SEND, GestaoMessage, WorkersActions } from "./common";
-import { DBWorkerUtil } from "./db-worker-util";
+import BigNumber from "bignumber.js";
+import { Acoes, AcoesRepository, StockType } from "../repositories/acoes";
+import { TableNames } from "../repositories/default-repository";
+import { GestaoMessage, WorkersActions } from "./common";
+import { WorkerDatabase } from "./worker-database";
 
 /* eslint-disable no-restricted-globals */
 console.debug('brapi-worker start');
 
-const dbWorker = new DBWorkerUtil('brapi');
+const dbWorker = new WorkerDatabase('brapi');
+const repository = new AcoesRepository(dbWorker);
 
 self.onmessage = (event: MessageEvent<GestaoMessage>) => {
   console.debug('brapi.onmessage', event);
@@ -21,21 +25,49 @@ async function loadAll(data: GestaoMessage) {
 
   const { stocks } = (await res.json() as BrapiResponse);
 
-  const acoesResponse = stocks.map(x => ({
+  const acoesReponse = stocks.map(x => ({
     nome: x.name,
     codigo: x.stock,
-    tipo: x.sector != null ? 1 : 4, // TODO: Add enum
+    tipo: x.sector != null ? StockType.COMPANY : StockType.OTHERS, // TODO: Add enum
     active: true,
-    valorDeMercado: x.market_cap,
+    valorDeMercado: new BigNumber(x.market_cap as any),
     logo: x.logo,
     setor: x.sector,
-  }))
+  }));
 
-  const acoes = await dbWorker.exec('select * from acoes');
+  const acoesASalvar: Acoes[] = []
+  const acoes = await repository.list<Acoes>(TableNames.ACOES);
+
+  const acoesDict = acoesToDict(acoes);
+
+  for (let index = 0; index < acoesReponse.length; index++) {
+    const acaoAtual = acoesReponse[index];
+    const acaoDoDB = acoesDict[acaoAtual.codigo] || {} as Acoes
+
+    acaoDoDB.active = acaoAtual.active;
+    acaoDoDB.codigo = acaoAtual.codigo;
+    acaoDoDB.logo = acaoAtual.logo;
+    acaoDoDB.nome = acaoAtual.nome;
+    acaoDoDB.setor = acaoAtual.setor as any;
+    acaoDoDB.tipo = acaoAtual.tipo;
+    acaoDoDB.valorDeMercado = acaoAtual.valorDeMercado;
+
+    acoesASalvar.push(acaoDoDB);
+  }
 
   console.log(acoes);
 
-  self.postMessage({ id: data.id, response: acoesResponse });
+  await repository.saveAll(TableNames.ACOES, acoesASalvar);
+
+  self.postMessage({ id: data.id, response: acoesReponse });
+}
+
+function acoesToDict(acoesReponse: Acoes[]): { [key: string]: Acoes } {
+  return acoesReponse.reduce((previous, next) => {
+    previous[next.codigo] = next;
+
+    return previous;
+  }, {});
 }
 
 console.debug('brapi-worker end');
@@ -94,3 +126,4 @@ export interface BrapiStock {
   sector: BrapiSector | null;
   type: BrapiType;
 }
+

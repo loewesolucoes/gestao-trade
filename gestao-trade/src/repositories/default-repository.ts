@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import moment from "moment";
-import { GestaoDatabase, RepositoryUtil } from "../utils/db-repository";
+import { RepositoryUtil } from "../utils/repository";
+import { IDatabase } from "./database";
 
 export enum MapperTypes {
   DATE,
@@ -20,28 +21,36 @@ export interface DefaultFields {
   updatedDate?: Date
 }
 
-enum StockType {
-  COMPANY = 1,
-  FII = 2,
-  ETFS = 3,
-  OTHERS = 4,
-}
-
-export interface Acoes extends DefaultFields {
-  nome?: string
-  codigo?: string
-  logo?: string
-  tipo?: StockType
-  active?: boolean
-  setor?: string
-  valorDeMercado?: BigNumber
-}
-
 const RUNNED_MIGRATION_CODE = 'runned';
 const DEFAULT_MAPPING = { createdDate: MapperTypes.DATE_TIME, updatedDate: MapperTypes.DATE_TIME, monthYear: MapperTypes.IGNORE };
 
 export class DefaultRepository {
-  public constructor(protected db: GestaoDatabase) { }
+  public constructor(protected db: IDatabase) { }
+
+  public async saveAll(tableName: TableNames, items: DefaultFields[]) {
+    let allParams = {};
+    let fullCommand = '';
+
+    items.forEach((x, i) => {
+      let execution = {} as any;
+
+      if (x.id == null)
+        execution = this.createInsertCommand(tableName, x, `${i}`);
+      else
+        execution = this.createUpdateCommand(tableName, x, `${i}`);
+
+      const { command, params } = execution;
+
+      fullCommand = `${fullCommand};${command}`
+      allParams = { ...allParams, ...params }
+    })
+
+    console.debug('saveAll', fullCommand, allParams)
+
+    this.db.exec(fullCommand, allParams);
+
+    await this.persistDb();
+  }
 
   public async save(tableName: TableNames, data: any) {
     let result = {} as any;
@@ -88,7 +97,7 @@ export class DefaultRepository {
     return this.parseSqlResultToObj(result, DEFAULT_MAPPING)[0][0];
   }
 
-  private async insert(tableName: TableNames, data: any) {
+  protected async insert(tableName: TableNames, data: any) {
     const { command, params, nextData } = this.createInsertCommand(tableName, data);
     const fullCommand = `${command};SELECT LAST_INSERT_ROWID();`
 
@@ -99,7 +108,7 @@ export class DefaultRepository {
     return nextData;
   }
 
-  private createInsertCommand(tableName: TableNames, data: any, paramsPrefix: string = '') {
+  protected createInsertCommand(tableName: TableNames, data: any, paramsPrefix: string = '') {
     const nextData = { ...data, createdDate: new Date() };
     const { keys, params } = this.parseToCommand(nextData, paramsPrefix);
     const command = `INSERT INTO ${tableName} (${keys.join(', ')}) VALUES (${keys.map(k => `$${k}${paramsPrefix}`).join(', ')})`;
@@ -107,7 +116,7 @@ export class DefaultRepository {
     return { command, params, nextData }
   }
 
-  private async update(tableName: TableNames, data: any) {
+  protected async update(tableName: TableNames, data: any) {
     const { command, params } = this.createUpdateCommand(tableName, data);
 
     await this.db.exec(command, params);
@@ -115,7 +124,7 @@ export class DefaultRepository {
     return this.get(tableName, data.id);
   }
 
-  private createUpdateCommand(tableName: TableNames, data: any, paramsPrefix: string = '') {
+  protected createUpdateCommand(tableName: TableNames, data: any, paramsPrefix: string = '') {
     const nextData = { ...data, updatedDate: new Date() };
     const { keys, params } = this.parseToCommand(nextData, paramsPrefix);
     const command = `UPDATE ${tableName} SET ${keys.map(k => `${k}=$${k}${paramsPrefix}`).join(', ')} WHERE id=$id${paramsPrefix}`;
@@ -123,7 +132,7 @@ export class DefaultRepository {
     return { command, params, nextData }
   }
 
-  private parseSqlResultToObj(result: initSqlJs.QueryExecResult[], mapper?: { [key: string]: MapperTypes }) {
+  protected parseSqlResultToObj(result: initSqlJs.QueryExecResult[], mapper?: { [key: string]: MapperTypes }) {
     return result.map(res => res.values.map(values => res.columns.reduce((p, n, i) => {
       const value = values[i];
       let original = true;
@@ -157,7 +166,7 @@ export class DefaultRepository {
     }, {} as any)));
   }
 
-  private parseToCommand(nextData: any, paramsPrefix: string = '') {
+  protected parseToCommand(nextData: any, paramsPrefix: string = '') {
     const keys = Object.keys(nextData).filter(k => nextData[k] !== undefined);
     const params = keys.reduce((p, n) => {
       let value = nextData[n] ?? null;
@@ -178,7 +187,7 @@ export class DefaultRepository {
     return { keys, params };
   }
 
-  private async runMigrations() {
+  protected async runMigrations() {
     await Promise.resolve();
 
     await this.db.exec(`CREATE TABLE IF NOT EXISTS "migrations" ("id" INTEGER NOT NULL,"name" TEXT NULL DEFAULT NULL,"executedDate" DATETIME NULL,PRIMARY KEY ("id"));`);

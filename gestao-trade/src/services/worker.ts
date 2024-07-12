@@ -1,4 +1,3 @@
-import { GestaoDatabase } from "../utils/db-repository";
 import { WorkersActions } from "../workers/common";
 
 export class WorkerService {
@@ -32,7 +31,7 @@ export class WorkerService {
 
     return new Promise((resolve, reject) => {
       this.onMessages[nextId] = event => {
-        console.debug('onmessage', event.data.id, nextId, event);
+        console.debug('WorkerService.onmessage', event.data.id, nextId, event);
 
         if (event.data.id === nextId) {
           if (event.data.error)
