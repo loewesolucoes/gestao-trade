@@ -6,6 +6,7 @@ import { useEnv } from '../../contexts/env';
 import { useStorage } from '../../contexts/storage';
 import { Parametro } from '../../repositories/parametros';
 import { Input } from '../../components/input';
+import { AuthButton } from '../../components/auth-button';
 
 export function Configuracoes() {
   const [isLoading, setIsLoading] = useState(false);
@@ -97,8 +98,7 @@ export function Configuracoes() {
                 <section className="card gdrive">
                   <h5 className="card-header">Google drive</h5>
                   <div className="card-body">
-                    ...
-                    {/* <AuthButton /> */}
+                    <AuthButton />
                   </div>
                 </section>
                 <section className="card">

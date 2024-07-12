@@ -40,6 +40,26 @@ export function AuthProvider(props: any) {
   const [gload, setGLoad] = useState({ api: isApiLoaded, client: isClientLoaded });
 
   useEffect(() => {
+    const scriptGapi = document.createElement('script');
+    const scriptGClient = document.createElement('script');
+
+    scriptGapi.src = "https://apis.google.com/js/api.js";
+    scriptGClient.src = "https://accounts.google.com/gsi/client";
+    scriptGapi.async = scriptGapi.defer = scriptGClient.async = scriptGClient.defer = true;
+
+    scriptGapi.onload = () => setGLoad((p) => ({ ...p, api: true }));
+    scriptGClient.onload = () => setGLoad((p) => ({ ...p, client: true }));
+
+    document.body.appendChild(scriptGapi);
+    document.body.appendChild(scriptGClient);
+
+    return () => {
+      document.body.removeChild(scriptGapi);
+      document.body.removeChild(scriptGClient);
+    }
+  }, []);
+
+  useEffect(() => {
     if (gload.api && gload.client) {
       createGDrive();
       isApiLoaded = isClientLoaded = true;
@@ -160,8 +180,6 @@ export function AuthProvider(props: any) {
       {...props}
     >
       {props.children}
-      <script async defer src="https://apis.google.com/js/api.js" onLoad={() => setGLoad((p) => ({ ...p, api: true }))} />
-      <script async defer src="https://accounts.google.com/gsi/client" onLoad={() => setGLoad((p) => ({ ...p, client: true }))} />
     </AuthContext.Provider>
   )
 }

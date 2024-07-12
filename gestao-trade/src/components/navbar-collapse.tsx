@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { AuthButton } from "./auth-button";
 
 const pages = [
   {
@@ -39,5 +40,6 @@ export function NavbarCollapse({ show, className }: CustomProps) {
         </li>
       ))}
     </ul>
+    <AuthButton />
   </div>;
 }
