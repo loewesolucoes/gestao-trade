@@ -34,27 +34,29 @@ export class AcoesRepository extends DefaultRepository {
     const query = `
     SELECT count(1) as total
     FROM acoes a
-    WHERE $searchStr is NULL    
-      OR a.codigo LIKE '%$searchStr%'
-      OR a.nome LIKE '%$searchStr%'
+    WHERE $search is NULL    
+      OR a.codigo LIKE $search
+      OR a.nome LIKE $search
+      OR a.setor LIKE $search
     ORDER BY a."active";
-
+      
     SELECT *
     FROM acoes a
-    WHERE $searchStr is NULL    
-      OR a.codigo LIKE '%$searchStr%'
-      OR a.nome LIKE '%$searchStr%'
+    WHERE $search is NULL    
+        OR a.codigo LIKE $search
+        OR a.nome LIKE $search
+        OR a.setor LIKE $search
     ORDER BY a."active"
     LIMIT $limit OFFSET $offset;
     `;
 
-    const result = await this.db.exec(query, { $search: searchStr || null, $offset: page * take, $limit: take });
+    const result = await this.db.exec(query, { $search: searchStr == null ? null : `%${searchStr}%`, $offset: (page - 1) * take, $limit: take });
 
     const parsed = this.parseSqlResultToObj(result, this.ACOES_MAPPING);
 
     return {
       total: BigNumber(parsed[0][0]?.total).toNumber(),
-      acoes: parsed[1],
+      acoes: parsed[1] || [],
     }
   }
 }

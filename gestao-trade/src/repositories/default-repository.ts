@@ -205,12 +205,12 @@ export class DefaultRepository {
     }
 
     if (migrations['acoes'] == null) {
-      this.db.exec(`CREATE TABLE IF NOT EXISTS "acoes" ("id" INTEGER NOT NULL,"nome" TEXT NOT NULL,"logo" TEXT NULL,"codigo" TEXT NULL, "tipo" INTEGER NULL, "active" INTEGER NULL, "valorDeMercado" REAL NULL, "setor" TEXT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
+      await this.db.exec(`CREATE TABLE IF NOT EXISTS "acoes" ("id" INTEGER NOT NULL,"nome" TEXT NOT NULL,"logo" TEXT NULL,"codigo" TEXT NULL, "tipo" INTEGER NULL, "active" INTEGER NULL, "valorDeMercado" REAL NULL, "setor" TEXT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
       migrations['acoes'] = RUNNED_MIGRATION_CODE;
     }
 
     if (migrations['desativar_acoes'] == null) {
-      this.db.exec(`UPDATE acoes SET "active" = 0 WHERE 1 = 1;`);
+      await this.db.exec(`UPDATE acoes SET "active" = 0 WHERE 1 = 1;`);
       migrations['desativar_acoes'] = RUNNED_MIGRATION_CODE;
     }
 
