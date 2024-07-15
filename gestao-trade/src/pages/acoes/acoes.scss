@@ -29,7 +29,12 @@
     display: flex;
     gap: 20px;
     align-items: flex-end;
-    text-wrap: nowrap;
+    flex-wrap: wrap;
+
+    @include media-breakpoint-up(lg) {
+      flex-wrap: nowrap;
+      text-wrap: nowrap;
+    }
   }
 
   @include media-breakpoint-down(md) {
@@ -58,8 +63,17 @@
 
 .pagination-section {
   display: flex;
+  flex-direction: column;
   padding: 20px;
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
+
+  > .pagination {
+    flex-wrap: wrap;
+  }
+
+  @include media-breakpoint-up(lg) {
+    flex-direction: row;
+  }
 }
