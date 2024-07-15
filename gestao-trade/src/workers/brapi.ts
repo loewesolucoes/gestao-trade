@@ -10,7 +10,7 @@ import moment from "moment";
 console.debug('brapi-worker start');
 
 const BRAPI_LAST_UPDATE_KEY = 'BRAPI_LAST_UPDATE';
-const dbWorker = new WorkerDatabase('brapi');
+const dbWorker = new WorkerDatabase(`brapi`);
 const repository = new AcoesRepository(dbWorker);
 const paramsRepository = new ParametrosRepository(dbWorker);
 

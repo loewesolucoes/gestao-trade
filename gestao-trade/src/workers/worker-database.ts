@@ -1,9 +1,7 @@
 import { IDatabase } from "../repositories/database";
 
-const pageUUID = crypto.randomUUID();
-
-const DB_CHANNEL_SEND = `gestao-database-channel-send-${pageUUID}`;
-const DB_CHANNEL_RECEIVE = `gestao-database-channel-receive-${pageUUID}`;
+const DB_CHANNEL_SEND = `gestao-database-channel-send`;
+const DB_CHANNEL_RECEIVE = `gestao-database-channel-receive`;
 
 export class WorkerDatabase implements IDatabase {
   private static readonly broadcastSend: BroadcastChannel = new BroadcastChannel(DB_CHANNEL_SEND);
@@ -26,6 +24,7 @@ export class WorkerDatabase implements IDatabase {
       const action = this.onExecMessages[id];
 
       if (action == null) {
+        // se estiver dando erro nessa parte deve ser devido a possuir duas tabs abertas
         console.error('invalid message id', id, event);
 
         return;

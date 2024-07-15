@@ -53,11 +53,13 @@ export function Home() {
       <section className='container'>
         {stocks == null ? <div className="alert alert-info">Carregando ações ativas...</div>
           : (
-            <div className="stocks">
-              {stocks.map(x => (
-                <AcaoCard key={x.codigo} acao={x} isActive={x.codigo === currentStock} onClick={s => setCurrentStock(s.codigo)} />
-              ))}
-            </div>
+            stocks.length === 0 ? (<div className="alert alert-info">Nenhuma ação ativa...</div>) : (
+              <div className="stocks">
+                {stocks.map(x => (
+                  <AcaoCard key={x.codigo} acao={x} isActive={x.codigo === currentStock} onClick={s => setCurrentStock(s.codigo)} />
+                ))}
+              </div>
+            )
           )
         }
       </section>
