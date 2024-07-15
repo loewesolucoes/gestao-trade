@@ -25,7 +25,7 @@ export class WorkerDatabase implements IDatabase {
 
       if (action == null) {
         // se estiver dando erro nessa parte deve ser devido a possuir duas tabs abertas
-        console.error('invalid message id', id, event);
+        console.debug('invalid message id', id, event);
 
         return;
       }

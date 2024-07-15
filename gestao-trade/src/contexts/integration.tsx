@@ -3,6 +3,7 @@
 import React, { createContext, useState, useEffect } from "react"
 import { brapiService } from "../services/brapi";
 import { useStorage } from "./storage";
+import { yahooService } from "../services/yahoo";
 
 const IntegrationContext = createContext({
   isRunning: true,
@@ -18,6 +19,7 @@ export function IntegrationProvider(props: any) {
 
   async function load() {
     await brapiService.loadAll();
+    await yahooService.loadAll();
     setIsRunning(false);
   }
 
