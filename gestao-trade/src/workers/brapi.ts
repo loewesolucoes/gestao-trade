@@ -31,7 +31,7 @@ async function loadAll(data: GestaoMessage) {
 
   if (lastUpdateParam == null || passou14Dias) {
     console.debug('calling brapi');
-    
+
     await loadAllAndSave();
     await paramsRepository.set(BRAPI_LAST_UPDATE_KEY, moment(new Date()).toISOString());
 
@@ -64,17 +64,21 @@ async function loadAllAndSave() {
 
   for (let index = 0; index < acoesReponse.length; index++) {
     const acaoAtual = acoesReponse[index];
-    const acaoDoDB = acoesDict[acaoAtual.codigo] || {} as Acoes;
+    const acaoDoDB = acoesDict[acaoAtual.codigo];
+    const acaoDoDBOrNew = acaoDoDB || {} as Acoes;
 
-    acaoDoDB.active = acaoAtual.active;
-    acaoDoDB.codigo = acaoAtual.codigo;
-    acaoDoDB.logo = acaoAtual.logo;
-    acaoDoDB.nome = acaoAtual.nome;
-    acaoDoDB.setor = acaoAtual.setor as any;
-    acaoDoDB.tipo = acaoAtual.tipo;
-    acaoDoDB.valorDeMercado = acaoAtual.valorDeMercado;
+    acaoDoDBOrNew.active = acaoAtual.active;
+    acaoDoDBOrNew.codigo = acaoAtual.codigo;
+    acaoDoDBOrNew.logo = acaoAtual.logo;
+    acaoDoDBOrNew.nome = acaoAtual.nome;
+    acaoDoDBOrNew.setor = acaoAtual.setor as any;
+    acaoDoDBOrNew.tipo = acaoAtual.tipo;
+    acaoDoDBOrNew.valorDeMercado = acaoAtual.valorDeMercado;
 
-    acoesASalvar.push(acaoDoDB);
+    if (acaoDoDB == null)
+      acaoDoDBOrNew.active = false;
+
+    acoesASalvar.push(acaoDoDBOrNew);
   }
 
   await repository.saveAll(TableNames.ACOES, acoesASalvar);
