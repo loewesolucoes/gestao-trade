@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/gestao-trade/static/css/main.2aaa0abf.css",
+    "main.css": "/gestao-trade/static/css/main.2d690fab.css",
     "main.js": "/gestao-trade/static/js/main.875e7136.js",
     "static/js/453.7ca0db63.chunk.js": "/gestao-trade/static/js/453.7ca0db63.chunk.js",
     "static/js/143.d80e4dc2.chunk.js": "/gestao-trade/static/js/143.d80e4dc2.chunk.js",
@@ -8,7 +8,7 @@
     "static/js/105.093ee82a.chunk.js": "/gestao-trade/static/js/105.093ee82a.chunk.js",
     "static/media/logo.svg": "/gestao-trade/static/media/logo.cda22cc64fde81d41c3b9662663f2717.svg",
     "index.html": "/gestao-trade/index.html",
-    "main.2aaa0abf.css.map": "/gestao-trade/static/css/main.2aaa0abf.css.map",
+    "main.2d690fab.css.map": "/gestao-trade/static/css/main.2d690fab.css.map",
     "main.875e7136.js.map": "/gestao-trade/static/js/main.875e7136.js.map",
     "453.7ca0db63.chunk.js.map": "/gestao-trade/static/js/453.7ca0db63.chunk.js.map",
     "143.d80e4dc2.chunk.js.map": "/gestao-trade/static/js/143.d80e4dc2.chunk.js.map",
@@ -16,7 +16,7 @@
     "105.093ee82a.chunk.js.map": "/gestao-trade/static/js/105.093ee82a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.2aaa0abf.css",
+    "static/css/main.2d690fab.css",
     "static/js/main.875e7136.js"
   ]
 }
