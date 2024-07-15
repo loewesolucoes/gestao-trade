@@ -3,10 +3,11 @@ import { WorkerDatabase } from "./worker-database";
 
 console.debug('database-broadcast-worker start');
 
-const worker = new Worker(`${process.env.PUBLIC_URL}/worker.sql-wasm.js`);
+const worker = new Worker(process.env.NODE_ENV === 'development' ? `${process.env.PUBLIC_URL}/worker.sql-wasm-debug.js` : `${process.env.PUBLIC_URL}/worker.sql-wasm.js`);
+// const worker = new Worker((new URL("sql.js/dist/worker.sql-wasm.js", import.meta.url)));
 
 WorkerDatabase.setOnMessage(event => {
-  console.debug('database-broadcast.onmessage', event);
+  console.debug('database-broadcast.setOnMessage', event);
 
   worker.postMessage(event.data);
 })

@@ -37,7 +37,6 @@ export class AcoesRepository extends DefaultRepository {
     WHERE $searchStr is NULL    
       OR a.codigo LIKE '%$searchStr%'
       OR a.nome LIKE '%$searchStr%'
-      OR a.setor LIKE '%$searchStr%'
     ORDER BY a."active";
 
     SELECT *
@@ -45,12 +44,11 @@ export class AcoesRepository extends DefaultRepository {
     WHERE $searchStr is NULL    
       OR a.codigo LIKE '%$searchStr%'
       OR a.nome LIKE '%$searchStr%'
-      OR a.setor LIKE '%$searchStr%'
     ORDER BY a."active"
     LIMIT $limit OFFSET $offset;
     `;
 
-    const result = await this.db.exec(query, { $search: searchStr, $offset: page * take, $limit: take });
+    const result = await this.db.exec(query, { $search: searchStr || null, $offset: page * take, $limit: take });
 
     const parsed = this.parseSqlResultToObj(result, this.ACOES_MAPPING);
 

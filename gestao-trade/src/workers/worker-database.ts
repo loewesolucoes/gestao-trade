@@ -24,7 +24,7 @@ export class WorkerDatabase implements IDatabase {
       if (action == null) {
         console.error('invalid message id', id, event);
 
-        throw new Error(`invalid message id => ${id}`);
+        return;
       }
 
       action(event);

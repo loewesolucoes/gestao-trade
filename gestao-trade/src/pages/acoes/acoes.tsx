@@ -7,6 +7,7 @@ import { Acoes } from '../../repositories/acoes';
 import { TimerUtil } from '../../utils/timer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useStorage } from '../../contexts/storage';
+import { Input } from '../../components/input';
 
 const PAGE_PARAM_NAME = "page";
 const SEARCH_PARAM_NAME = "q";
@@ -99,8 +100,8 @@ export function AcoesPage() {
     setIsLoadingMark(false);
   }
 
-  function onChangeSearch(e: any) {
-    setSearchStr(e?.target?.value);
+  function onChangeSearch(value: string) {
+    setSearchStr(value);
     setPage(1);
   }
 
@@ -112,7 +113,7 @@ export function AcoesPage() {
         <div className="mark-section">
           <div className="form-group">
             <label htmlFor="buscaAtivo" className="form-label">Buscar ativo:</label>
-            <input type="search" id="buscaAtivo" name="buscaAtivo" className="form-control" placeholder="PETR4, AZUL4, etc" value={searchStr} onChange={onChangeSearch} />
+            <Input type="search" id="buscaAtivo" name="buscaAtivo" className="form-control" placeholder="PETR4, AZUL4, etc" value={searchStr} onChange={onChangeSearch} />
           </div>
           <div className="buttons">
             {Object.keys(acoesEscolhidas).length > 0 && (

@@ -6,8 +6,9 @@
 .pnp.js
 
 public/sql-wasm.wasm
+public/sql-wasm-debug.wasm
 public/worker.sql-wasm.js
-public/worker.sql-wasm.wasm
+public/worker.sql-wasm-debug.js
 
 # testing
 /coverage
