@@ -1,5 +1,9 @@
 import { IDatabase } from "../repositories/database";
-import { DB_CHANNEL_RECEIVE, DB_CHANNEL_SEND } from "./common";
+
+const pageUUID = crypto.randomUUID();
+
+const DB_CHANNEL_SEND = `gestao-database-channel-send-${pageUUID}`;
+const DB_CHANNEL_RECEIVE = `gestao-database-channel-receive-${pageUUID}`;
 
 export class WorkerDatabase implements IDatabase {
   private static readonly broadcastSend: BroadcastChannel = new BroadcastChannel(DB_CHANNEL_SEND);
