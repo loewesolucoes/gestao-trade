@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/gestao-trade/static/css/main.2aaa0abf.css",
-    "main.js": "/gestao-trade/static/js/main.6cab48b6.js",
+    "main.js": "/gestao-trade/static/js/main.113805f5.js",
     "static/js/453.7ca0db63.chunk.js": "/gestao-trade/static/js/453.7ca0db63.chunk.js",
-    "static/js/143.dfba94b8.chunk.js": "/gestao-trade/static/js/143.dfba94b8.chunk.js",
-    "static/js/778.4e8ed85d.chunk.js": "/gestao-trade/static/js/778.4e8ed85d.chunk.js",
+    "static/js/143.5986b94e.chunk.js": "/gestao-trade/static/js/143.5986b94e.chunk.js",
+    "static/js/778.a3b2841a.chunk.js": "/gestao-trade/static/js/778.a3b2841a.chunk.js",
     "static/js/105.093ee82a.chunk.js": "/gestao-trade/static/js/105.093ee82a.chunk.js",
     "static/media/logo.svg": "/gestao-trade/static/media/logo.cda22cc64fde81d41c3b9662663f2717.svg",
     "index.html": "/gestao-trade/index.html",
     "main.2aaa0abf.css.map": "/gestao-trade/static/css/main.2aaa0abf.css.map",
-    "main.6cab48b6.js.map": "/gestao-trade/static/js/main.6cab48b6.js.map",
+    "main.113805f5.js.map": "/gestao-trade/static/js/main.113805f5.js.map",
     "453.7ca0db63.chunk.js.map": "/gestao-trade/static/js/453.7ca0db63.chunk.js.map",
-    "143.dfba94b8.chunk.js.map": "/gestao-trade/static/js/143.dfba94b8.chunk.js.map",
-    "778.4e8ed85d.chunk.js.map": "/gestao-trade/static/js/778.4e8ed85d.chunk.js.map",
+    "143.5986b94e.chunk.js.map": "/gestao-trade/static/js/143.5986b94e.chunk.js.map",
+    "778.a3b2841a.chunk.js.map": "/gestao-trade/static/js/778.a3b2841a.chunk.js.map",
     "105.093ee82a.chunk.js.map": "/gestao-trade/static/js/105.093ee82a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.2aaa0abf.css",
-    "static/js/main.6cab48b6.js"
+    "static/js/main.113805f5.js"
   ]
 }
