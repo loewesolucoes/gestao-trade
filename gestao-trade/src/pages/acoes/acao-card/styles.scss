@@ -1,0 +1,55 @@
+.stock-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  border: 5px solid #dee2e6 !important;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+  opacity: 0.5;
+
+  &.active {
+    opacity: 1;
+  }
+
+  &.marked {
+    border-style: dashed !important;
+    border-color: #83878b !important;
+  }
+
+  > img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  > h5 {
+    text-wrap: wrap;
+    word-break: break-all;
+  }
+
+  > .info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+
+    > span {
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border: 1px solid #adb5bd !important;
+      border-color: #adb5bd;
+      color: #495057;
+      background-color: #ced4da;
+      border-radius: 20px;
+    }
+  }
+}

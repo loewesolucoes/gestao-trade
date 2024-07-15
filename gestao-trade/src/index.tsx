@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AppProviders } from './contexts';
 
-import { Home, Configuracoes, FAQ, Relatorios, Acoes } from './pages';
+import { Home, Configuracoes, FAQ, Relatorios, AcoesPage } from './pages';
 
 const router = createBrowserRouter([
   {
@@ -14,7 +14,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/acoes",
-    element: <Acoes />,
+    element: <AcoesPage />,
   },
   {
     path: "/relatorios",

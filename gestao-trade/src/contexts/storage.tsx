@@ -7,8 +7,10 @@ import { GDriveUtil } from "../utils/gdrive";
 import { RepositoryUtil } from "../utils/repository";
 import { DefaultRepository } from "../repositories/default-repository";
 import { ParametrosRepository } from "../repositories/parametros";
+import { AcoesRepository } from "../repositories/acoes";
 
 interface Repo extends DefaultRepository {
+  acoes: AcoesRepository;
   params: ParametrosRepository
 }
 
@@ -57,6 +59,7 @@ export function StorageProvider(props: any) {
     const sqldb = repository.db;
     
     repository.params = new ParametrosRepository(sqldb);
+    repository.acoes = new AcoesRepository(sqldb);
 
     setRepository(repository);
     setIsDbOk(true);

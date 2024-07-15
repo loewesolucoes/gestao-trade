@@ -7,6 +7,7 @@ export enum MapperTypes {
   DATE,
   DATE_TIME,
   NUMBER,
+  BOOLEAN,
   IGNORE,
 }
 
@@ -22,9 +23,9 @@ export interface DefaultFields {
 }
 
 const RUNNED_MIGRATION_CODE = 'runned';
-const DEFAULT_MAPPING = { createdDate: MapperTypes.DATE_TIME, updatedDate: MapperTypes.DATE_TIME, monthYear: MapperTypes.IGNORE };
 
 export class DefaultRepository {
+  protected readonly DEFAULT_MAPPING = { createdDate: MapperTypes.DATE_TIME, updatedDate: MapperTypes.DATE_TIME, monthYear: MapperTypes.IGNORE };
   public constructor(protected db: IDatabase) { }
 
   public async saveAll(tableName: TableNames, items: DefaultFields[]) {
@@ -83,7 +84,7 @@ export class DefaultRepository {
     if (!Array.isArray(result))
       throw new Error(`${tableName} não encontrado (a)`);
 
-    return this.parseSqlResultToObj(result, DEFAULT_MAPPING)[0] || [];
+    return this.parseSqlResultToObj(result, this.DEFAULT_MAPPING)[0] || [];
   }
 
   public async get<T>(tableName: TableNames, id: string): Promise<T> {
@@ -94,7 +95,7 @@ export class DefaultRepository {
     if (result.length === 0)
       throw new Error(`${tableName} não encontrado (a)`);
 
-    return this.parseSqlResultToObj(result, DEFAULT_MAPPING)[0][0];
+    return this.parseSqlResultToObj(result, this.DEFAULT_MAPPING)[0][0];
   }
 
   protected async insert(tableName: TableNames, data: any) {
@@ -147,6 +148,9 @@ export class DefaultRepository {
             original = false;
           } else if (mapper[n] === MapperTypes.NUMBER) {
             p[n] = value;
+            original = false;
+          } else if (mapper[n] === MapperTypes.BOOLEAN) {
+            p[n] = !!value;
             original = false;
           } else if (mapper[n] === MapperTypes.IGNORE) {
             original = false;
@@ -203,6 +207,11 @@ export class DefaultRepository {
     if (migrations['acoes'] == null) {
       this.db.exec(`CREATE TABLE IF NOT EXISTS "acoes" ("id" INTEGER NOT NULL,"nome" TEXT NOT NULL,"logo" TEXT NULL,"codigo" TEXT NULL, "tipo" INTEGER NULL, "active" INTEGER NULL, "valorDeMercado" REAL NULL, "setor" TEXT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
       migrations['acoes'] = RUNNED_MIGRATION_CODE;
+    }
+
+    if (migrations['desativar_acoes'] == null) {
+      this.db.exec(`UPDATE acoes SET "active" = 0 WHERE 1 = 1;`);
+      migrations['desativar_acoes'] = RUNNED_MIGRATION_CODE;
     }
 
     // TODO: Add parametros iniciais em branco
