@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js";
 import { Acoes, AcoesRepository, StockType } from "../repositories/acoes";
-import { TableNames } from "../repositories/default-repository";
+import { TableNames } from "../repositories/default";
 import { GestaoMessage, WorkersActions } from "./common";
-import { WorkerDatabase } from "./worker-database";
+import { WorkerDatabaseConnector } from "./db-connector";
 import { ParametrosRepository } from "../repositories/parametros";
 import moment from "moment";
 
@@ -10,7 +10,7 @@ import moment from "moment";
 console.debug('brapi-worker start');
 
 const BRAPI_LAST_UPDATE_KEY = 'BRAPI_LAST_UPDATE';
-const dbWorker = new WorkerDatabase(`brapi`);
+const dbWorker = new WorkerDatabaseConnector(`brapi`);
 const repository = new AcoesRepository(dbWorker);
 const paramsRepository = new ParametrosRepository(dbWorker);
 

@@ -1,4 +1,4 @@
-import { DefaultFields, DefaultRepository } from "./default-repository";
+import { DefaultFields, DefaultRepository } from "./default";
 
 
 export interface HistoricoAcoes extends DefaultFields {

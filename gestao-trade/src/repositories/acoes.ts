@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { DefaultFields, DefaultRepository, MapperTypes, TableNames } from "./default-repository";
+import { DefaultFields, DefaultRepository, MapperTypes, TableNames } from "./default";
 
 export enum StockType {
   COMPANY = 1,

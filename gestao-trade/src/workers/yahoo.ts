@@ -1,5 +1,5 @@
 import { GestaoMessage, WorkersActions } from "./common";
-import { WorkerDatabase } from "./worker-database";
+import { WorkerDatabaseConnector } from "./db-connector";
 import { ParametrosRepository } from "../repositories/parametros";
 import moment from "moment";
 import { HistoricoAcoesRepository } from "../repositories/historico-acoes";
@@ -8,7 +8,7 @@ import { HistoricoAcoesRepository } from "../repositories/historico-acoes";
 console.debug('yahoo-worker start');
 
 const YAHOO_LAST_UPDATE_KEY = 'YAHOO_LAST_UPDATE';
-const dbWorker = new WorkerDatabase(`yahoo`);
+const dbWorker = new WorkerDatabaseConnector(`yahoo`);
 const repository = new HistoricoAcoesRepository(dbWorker);
 const paramsRepository = new ParametrosRepository(dbWorker);
 

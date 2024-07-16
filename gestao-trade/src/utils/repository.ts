@@ -1,7 +1,7 @@
 import localforage from 'localforage'
 import { Buffer } from 'buffer';
-import { DefaultRepository } from '../repositories/default-repository';
-import { GestaoDatabase } from '../repositories/database';
+import { DefaultRepository } from '../repositories/default';
+import { DatabaseConnector } from '../repositories/database-connector';
 
 const BUFFER_TYPE = 'base64';
 
@@ -15,7 +15,7 @@ export class RepositoryUtil {
       data = Buffer.from(localDump, BUFFER_TYPE);
     }
 
-    const db = new GestaoDatabase();
+    const db = new DatabaseConnector();
 
     await db.open(data);
 

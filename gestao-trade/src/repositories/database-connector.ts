@@ -6,13 +6,13 @@ export interface IDatabase {
 }
 
 
-export class GestaoDatabase implements IDatabase {
+export class DatabaseConnector implements IDatabase {
   private currentId = 0;
   private readonly worker: Worker;
   private readonly onMessages: { [key: string]: (event: MessageEvent) => void } = {};
 
   constructor() {
-    this.worker = new Worker(new URL("../workers/database-broadcast.ts", import.meta.url));
+    this.worker = new Worker(new URL("../workers/db-broadcast.ts", import.meta.url));
     this.worker.onerror = e => console.log("Worker error: ", e);
     this.worker.onmessage = (event) => {
       const { id } = event.data;

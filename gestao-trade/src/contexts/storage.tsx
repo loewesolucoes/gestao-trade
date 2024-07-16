@@ -5,7 +5,7 @@ import React, { createContext, useState, useEffect } from "react"
 import { useAuth } from "./auth";
 import { GDriveUtil } from "../utils/gdrive";
 import { RepositoryUtil } from "../utils/repository";
-import { DefaultRepository } from "../repositories/default-repository";
+import { DefaultRepository } from "../repositories/default";
 import { ParametrosRepository } from "../repositories/parametros";
 import { AcoesRepository } from "../repositories/acoes";
 

@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import moment from "moment";
 import { RepositoryUtil } from "../utils/repository";
-import { IDatabase } from "./database";
+import { IDatabase } from "./database-connector";
 
 export enum MapperTypes {
   DATE,

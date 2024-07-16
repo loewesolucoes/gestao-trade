@@ -1,4 +1,4 @@
-import { DefaultFields, DefaultRepository, TableNames } from "./default-repository";
+import { DefaultFields, DefaultRepository, TableNames } from "./default";
 
 export interface Parametro extends DefaultFields {
   chave: string
