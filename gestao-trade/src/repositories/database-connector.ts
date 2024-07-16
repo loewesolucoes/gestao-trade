@@ -34,7 +34,7 @@ export class DatabaseConnector implements IDatabase {
 
     return new Promise((resolve, reject) => {
       this.onMessages[nextId] = event => {
-        console.debug('GestaoDatabase.onmessage', event.data.id, nextId, event);
+        console.debug('DatabaseConnector.onmessage', event.data.id, nextId, event);
 
         if (event.data.id === nextId) {
           if (event.data.error)
@@ -44,7 +44,7 @@ export class DatabaseConnector implements IDatabase {
         }
       };
 
-      console.debug('GestaoDatabase.sending', 'exec', nextId, sql, params);
+      console.debug('DatabaseConnector.sending', 'exec', nextId, sql, params);
 
       this.worker.postMessage({
         id: nextId,
@@ -60,7 +60,7 @@ export class DatabaseConnector implements IDatabase {
 
     return new Promise((resolve, reject) => {
       this.onMessages[nextId] = event => {
-        console.debug('GestaoDatabase.onmessage', event.data.id, nextId, event);
+        console.debug('DatabaseConnector.onmessage', event.data.id, nextId, event);
         if (event.data.id === nextId) {
           if (event.data.error)
             reject(event.data);
@@ -69,7 +69,7 @@ export class DatabaseConnector implements IDatabase {
         }
       };
 
-      console.debug('GestaoDatabase.sending', 'export', nextId);
+      console.debug('DatabaseConnector.sending', 'export', nextId);
 
       this.worker.postMessage({
         id: nextId,
@@ -83,7 +83,7 @@ export class DatabaseConnector implements IDatabase {
 
     return new Promise((resolve, reject) => {
       this.onMessages[nextId] = event => {
-        console.debug('GestaoDatabase.onmessage', event.data.id, nextId, event);
+        console.debug('DatabaseConnector.onmessage', event.data.id, nextId, event);
         if (event.data.id === nextId) {
           if (event.data.error)
             reject(event.data);
@@ -92,7 +92,7 @@ export class DatabaseConnector implements IDatabase {
         }
       };
 
-      console.debug('GestaoDatabase.sending', 'open', nextId);
+      console.debug('DatabaseConnector.sending', 'open', nextId);
 
       this.worker.postMessage({
         id: nextId,

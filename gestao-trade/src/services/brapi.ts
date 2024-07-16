@@ -1,7 +1,7 @@
 import { WorkersActions } from "../workers/common";
 import { WorkerService } from "./worker";
 
-class BrapiService extends WorkerService {
+export class BrapiService extends WorkerService {
   constructor() {
     super(new Worker(new URL("../workers/brapi.ts", import.meta.url)));
   }
@@ -12,5 +12,3 @@ class BrapiService extends WorkerService {
     console.log(response);
   }
 }
-
-export const brapiService = new BrapiService();

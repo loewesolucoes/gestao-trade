@@ -1,25 +1,22 @@
 import { IDatabase } from "../repositories/database-connector";
+import { DB_BROADCAST_CHANNEL_SW_KEY, UNIQUE_KEY } from "./common";
 
-const DB_CHANNEL_SEND = `gestao-database-channel-send`;
-const DB_CHANNEL_RECEIVE = `gestao-database-channel-receive`;
+const DB_CHANNEL_SEND = `gestao-database-channel-send-${UNIQUE_KEY}`;
+const DB_CHANNEL_RECEIVE = `gestao-database-channel-receive-${UNIQUE_KEY}`;
 
 export class WorkerDatabaseConnector implements IDatabase {
-  private static readonly broadcastSend: BroadcastChannel = new BroadcastChannel(DB_CHANNEL_SEND);
-  private static readonly broadcastReceive: BroadcastChannel = new BroadcastChannel(DB_CHANNEL_RECEIVE);
-  private static readonly onMessages: ((event: MessageEvent) => void)[] = [];
-  private static readonly onExecMessages: { [key: string]: (event: MessageEvent) => void } = {};
+  private readonly broadcastSend: BroadcastChannel = new BroadcastChannel(DB_CHANNEL_SEND);
+  private readonly broadcastReceive: BroadcastChannel = new BroadcastChannel(DB_CHANNEL_RECEIVE);
+  private readonly broadcastConnect: BroadcastChannel = new BroadcastChannel(DB_BROADCAST_CHANNEL_SW_KEY);
+  private readonly onMessages: ((event: MessageEvent) => void)[] = [];
+  private readonly onExecMessages: { [key: string]: (event: MessageEvent) => void } = {};
+  private readonly workerName: string
   private currentId = 0;
 
-  public static _init() {
-    WorkerDatabaseConnector.broadcastSend.onmessage = (event) => {
-      WorkerDatabaseConnector.onMessages.forEach(x => x(event));
-    }
+  constructor(workerName: string) {
+    this.workerName = `sw-${workerName}`;
 
-    WorkerDatabaseConnector.broadcastSend.onmessageerror = (event) => {
-      console.error('WorkerDatabase.onmessageerror', event);
-    }
-
-    WorkerDatabaseConnector.broadcastReceive.onmessage = (event) => {
+    this.broadcastReceive.onmessage = (event) => {
       const { id } = event.data;
       const action = this.onExecMessages[id];
 
@@ -27,34 +24,39 @@ export class WorkerDatabaseConnector implements IDatabase {
         // se estiver dando erro nessa parte deve ser devido a possuir duas tabs abertas
         console.debug('invalid message id', id, event);
 
-        return;
+        throw new Error('invalid message id');
       }
 
       action(event);
       delete this.onExecMessages[id];
     }
 
-    WorkerDatabaseConnector.broadcastReceive.onmessageerror = (event) => {
-      console.error('WorkerDatabase.onmessageerror', event);
+    this.broadcastReceive.onmessageerror = (event) => {
+      console.error('WorkerDatabaseConnector.onmessageerror', event);
     }
+
+    this.broadcastConnect.postMessage({
+      id: 'connect',
+      swName: this.workerName,
+      sendChannel: DB_CHANNEL_SEND,
+      receiveChannel: DB_CHANNEL_RECEIVE,
+    })
   }
 
-  constructor(private workerName: string) { }
-
-  public static setOnMessage(action: (e: MessageEvent) => void) {
+  public setOnMessage(action: (e: MessageEvent) => void) {
     this.onMessages.push(action);
   }
 
-  public static postReceive(event: MessageEvent) {
-    WorkerDatabaseConnector.broadcastReceive.postMessage(event.data);
+  public postReceive(event: MessageEvent) {
+    this.broadcastReceive.postMessage(event.data);
   }
 
   public async exec(sql: string, params?: any): Promise<initSqlJs.QueryExecResult[]> {
-    const nextId = `sw-${this.workerName}-exec-${this.currentId++}`;
+    const nextId = `${this.workerName}:exec-${this.currentId++}`;
 
     return new Promise((resolve, reject) => {
-      WorkerDatabaseConnector.onExecMessages[nextId] = event => {
-        console.debug('WorkerDatabase.onmessage', event.data.id, nextId, event);
+      this.onExecMessages[nextId] = event => {
+        console.debug('WorkerDatabaseConnector.onmessage', event.data.id, nextId, event);
 
         if (event.data.id === nextId) {
           if (event.data.error)
@@ -64,9 +66,9 @@ export class WorkerDatabaseConnector implements IDatabase {
         }
       };
 
-      console.debug('WorkerDatabase.sending', 'exec', nextId, sql, params);
+      console.debug('WorkerDatabaseConnector.sending', 'exec', nextId, sql, params);
 
-      WorkerDatabaseConnector.broadcastSend.postMessage({
+      this.broadcastSend.postMessage({
         id: nextId,
         action: "exec",
         sql: sql,
@@ -76,11 +78,11 @@ export class WorkerDatabaseConnector implements IDatabase {
   }
 
   public async export(): Promise<Uint8Array> {
-    const nextId = `sw-${this.workerName}-export-${this.currentId++}`;
+    const nextId = `${this.workerName}:export-${this.currentId++}`;
 
     return new Promise((resolve, reject) => {
-      WorkerDatabaseConnector.onExecMessages[nextId] = event => {
-        console.debug('WorkerDatabase.onmessage', event.data.id, nextId, event);
+      this.onExecMessages[nextId] = event => {
+        console.debug('WorkerDatabaseConnector.onmessage', event.data.id, nextId, event);
 
         if (event.data.id === nextId) {
           if (event.data.error)
@@ -90,9 +92,9 @@ export class WorkerDatabaseConnector implements IDatabase {
         }
       };
 
-      console.debug('WorkerDatabase.sending', 'export', nextId);
+      console.debug('WorkerDatabaseConnector.sending', 'export', nextId);
 
-      WorkerDatabaseConnector.broadcastSend.postMessage({
+      this.broadcastSend.postMessage({
         id: nextId,
         action: "export",
       });
@@ -103,5 +105,3 @@ export class WorkerDatabaseConnector implements IDatabase {
     throw new Error("Method not implemented.");
   }
 }
-
-WorkerDatabaseConnector._init();

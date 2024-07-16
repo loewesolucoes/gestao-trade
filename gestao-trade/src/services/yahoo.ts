@@ -1,7 +1,7 @@
 import { WorkersActions } from "../workers/common";
 import { WorkerService } from "./worker";
 
-class YahooService extends WorkerService {
+export class YahooService extends WorkerService {
   constructor() {
     super(new Worker(new URL("../workers/yahoo.ts", import.meta.url)));
   }
@@ -12,5 +12,3 @@ class YahooService extends WorkerService {
     console.log(response);
   }
 }
-
-export const yahooService = new YahooService();

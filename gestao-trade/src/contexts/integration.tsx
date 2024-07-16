@@ -1,9 +1,9 @@
 "use client";
 
 import React, { createContext, useState, useEffect } from "react"
-import { brapiService } from "../services/brapi";
+import { BrapiService } from "../services/brapi";
 import { useStorage } from "./storage";
-import { yahooService } from "../services/yahoo";
+import { YahooService } from "../services/yahoo";
 
 const IntegrationContext = createContext({
   isRunning: true,
@@ -18,6 +18,9 @@ export function IntegrationProvider(props: any) {
   }, [isDbOk]);
 
   async function load() {
+    const brapiService = new BrapiService();
+    const yahooService = new YahooService();
+
     await brapiService.loadAll();
     await yahooService.loadAll();
     setIsRunning(false);
