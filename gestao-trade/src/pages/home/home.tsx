@@ -6,6 +6,7 @@ import { Acoes } from '../../repositories/acoes';
 import { useStorage } from '../../contexts/storage';
 import { AcaoCard } from '../acoes/acao-card/acao-card';
 import { ChartComponent } from '../../components/chart';
+import { NotificationUtil } from '../../utils/notification';
 
 interface HistoricoAcao { }
 
@@ -31,6 +32,8 @@ export function Home() {
 
   async function load() {
     const acoes = await repository.acoes.listActives();
+
+    NotificationUtil.send('teste');
 
     setAcoes(acoes);
   }
