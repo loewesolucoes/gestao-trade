@@ -3,6 +3,7 @@ import { WorkerDatabaseConnector } from "./db-connector";
 import { ParametrosRepository } from "../repositories/parametros";
 import moment from "moment";
 import { HistoricoAcoesRepository } from "../repositories/historico-acoes";
+import { NotificationUtil } from "../utils/notification";
 
 /* eslint-disable no-restricted-globals */
 console.debug('yahoo-worker start');
@@ -30,11 +31,17 @@ async function loadAll(data: GestaoMessage) {
   if (true) {
     console.debug('calling yahoo');
 
-    const rawResponse = await fetch('https://query1.finance.yahoo.com/v7/finance/download/PETR3.SA?period1=-2208988800&period2=1720569600&interval=1d&events=history');
+    try {
+      const rawResponse = await fetch('https://query1.finance.yahoo.com/v7/finance/download/PETR3.SA?period1=-2208988800&period2=1720569600&interval=1d&events=history');
 
-    const response = await rawResponse.text();
+      const response = await rawResponse.text();
 
-    console.log(response);
+      console.log(response);
+    } catch (ex) {
+      console.error('Enable cors', ex);
+
+      NotificationUtil.send('Você esta sem conexão a internet ou precisa habilitar a extensão <a href="https://webextension.org/listing/access-control.html" target="_blank">Cors Unblock</a> para usar a aplicação')
+    }
 
     console.debug('end calling yahoo');
   } else console.debug('not needed to call yahoo;')
