@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AppProviders } from './contexts';
 
-import { Home, Configuracoes, FAQ, Relatorios, AcoesPage } from './pages';
+import { Home, Configuracoes, FAQ, Relatorios, AcoesPage, NotFound } from './pages';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: "/perguntas-frequentes",
     element: <FAQ />,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ], {
   basename: process.env.PUBLIC_URL,
