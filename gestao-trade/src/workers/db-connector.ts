@@ -24,7 +24,7 @@ export class WorkerDatabaseConnector implements IDatabase {
         // se estiver dando erro nessa parte deve ser devido a possuir duas tabs abertas
         console.debug('invalid message id', id, event);
 
-        throw new Error('invalid message id');
+        throw new Error(`invalid message id => ${id} (pode ser que você esteja com outra tab aberta)`);
       }
 
       action(event);
