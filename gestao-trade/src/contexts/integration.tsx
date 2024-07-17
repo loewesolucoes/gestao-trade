@@ -12,14 +12,22 @@ const IntegrationContext = createContext({
 export function IntegrationProvider(props: any) {
   const { isDbOk } = useStorage();
   const [isRunning, setIsRunning] = useState(false);
+  const [brapiService, setBrapiService] = useState<BrapiService>();
+  const [yahooService, setYahooService] = useState<YahooService>();
 
   useEffect(() => {
-    isDbOk && load();
+    if (isDbOk) {
+      setBrapiService(new BrapiService());
+      setYahooService(new YahooService());
+    }
   }, [isDbOk]);
 
+  useEffect(() => {
+    load();
+  }, [brapiService, yahooService]);
+
   async function load() {
-    const brapiService = new BrapiService();
-    const yahooService = new YahooService();
+    if (brapiService == null || yahooService == null) return;
 
     await brapiService.loadAll();
     await yahooService.loadAll();

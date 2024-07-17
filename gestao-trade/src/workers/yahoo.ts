@@ -23,6 +23,15 @@ self.onmessage = (event: MessageEvent<GestaoMessage>) => {
   }
 };
 
+/**
+ * 
+ * Date,Open,High,Low,Close,Adj Close,Volume
+2000-01-03,4.593750,4.593750,4.593750,4.593750,1.369073,3998720000
+2000-01-04,4.335937,4.335937,4.335937,4.335937,1.292237,3098880000
+2000-01-05,4.394531,4.394531,4.394531,4.394531,1.309699,6645760000
+2000-01-06,4.359375,4.359375,4.359375,4.359375,1.299222,3303680000
+ */
+
 async function loadAll(data: GestaoMessage) {
   const lastUpdateParam = await paramsRepository.getByKey(YAHOO_LAST_UPDATE_KEY)
   const lastUpdate = moment(lastUpdateParam?.valor);
@@ -34,9 +43,20 @@ async function loadAll(data: GestaoMessage) {
     try {
       const rawResponse = await fetch('https://query1.finance.yahoo.com/v7/finance/download/PETR3.SA?period1=-2208988800&period2=1720569600&interval=1d&events=history');
 
-      const response = await rawResponse.text();
+      if (rawResponse.ok && rawResponse?.body != null) {
+        const response = await rawResponse.text()
+        const lines = response.split('\n')
 
-      console.log(response);
+        for (let index = 0; index < lines.length; index++) {
+          const element = lines[index];
+          //
+        }
+      } else {
+        console.error('Yahoo status error', rawResponse);
+
+        NotificationUtil.send('Erro ao integrar com o serviço yahoo');
+      }
+
     } catch (ex) {
       console.error('Enable cors', ex);
 
