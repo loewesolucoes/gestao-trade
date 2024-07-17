@@ -16,7 +16,7 @@ export class WorkerService {
       if (action == null) {
         console.error('invalid message id', id, event);
 
-        throw new Error(`invalid message id => ${id}`);
+        throw new Error(`invalid message id => ${id} (pode ser que você esteja com outra tab aberta)`);
       }
 
       action(event);
