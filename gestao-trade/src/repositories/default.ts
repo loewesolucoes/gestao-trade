@@ -29,46 +29,6 @@ export class DefaultRepository {
   protected readonly DEFAULT_MAPPING = { createdDate: MapperTypes.DATE_TIME, updatedDate: MapperTypes.DATE_TIME, monthYear: MapperTypes.IGNORE };
   public constructor(protected db: IDatabase) { }
 
-  public async bulkInsert(tableName: TableNames, items: DefaultFields[]) {
-    const fullCommand = ['BEGIN TRANSACTION'];
-    const valuesOfInsert: string[] = [];
-    let allParams = {};
-
-    console.debug('bulkInsert:start')
-
-    for (let index = 0; index < items.length; index++) {
-      const item = items[index];
-      let execution = {} as any;
-
-      execution = this.createInsertCommand(tableName, item, `${index}`);
-
-      const { valuesCommand, params } = execution;
-
-      valuesOfInsert.push(valuesCommand);
-      allParams = Object.assign(allParams, params);
-    }
-
-    const firstItem = items[0];
-    const keys = Object.keys(firstItem);
-
-    fullCommand.push(`INSERT INTO ${tableName} (${keys.join(', ')}) VALUES ${valuesOfInsert.join(', ')}`);
-    fullCommand.push('COMMIT');
-
-    const fullCommandStr = fullCommand.join(';');
-
-    console.debug('bulkInsert:parse:ok')
-
-    await this.db.exec(fullCommandStr, allParams);
-
-    console.debug('bulkInsert:exec:ok')
-
-    await this.persistDb();
-
-    console.debug('bulkInsert:persist:ok')
-
-    console.debug('bulkInsert:end')
-  }
-
   public async saveAll(tableName: TableNames, items: DefaultFields[]) {
     const fullCommand = ['BEGIN TRANSACTION'];
     let allParams = {};
