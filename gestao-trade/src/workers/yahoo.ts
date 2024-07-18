@@ -70,6 +70,7 @@ async function downloadAndSaveIfNeed(acaoIntegracao: IntegracaoHistoricoAcao) {
     const records = await downloadHistoricalDataAndParse(codigoAcao, periodStart, periodEnd, intervalo);
 
     if (records.length > 0) {
+      console.debug(`yahoo:${codigoAcao} save start`);
       await repository.saveAll(TableNames.HISTORICO_ACOES, records);
 
       console.debug(`yahoo:${codigoAcao} save ok`);

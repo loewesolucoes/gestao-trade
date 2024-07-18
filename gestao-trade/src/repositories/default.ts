@@ -33,6 +33,8 @@ export class DefaultRepository {
     let allParams = {};
     let fullCommand = '';
 
+    console.debug('saveAll:start')
+
     items.forEach((x, i) => {
       let execution = {} as any;
 
@@ -46,12 +48,20 @@ export class DefaultRepository {
       fullCommand = `${fullCommand};${command}`
       allParams = { ...allParams, ...params }
     })
+    
+    console.debug('saveAll:parse:ok')
 
     console.debug('saveAll', fullCommand, allParams)
 
-    this.db.exec(fullCommand, allParams);
+    await this.db.exec(fullCommand, allParams);
 
+    console.debug('saveAll:exec:ok')
+    
     await this.persistDb();
+
+    console.debug('saveAll:persist:ok')
+
+    console.debug('saveAll:end')
   }
 
   public async save(tableName: TableNames, data: any) {
@@ -216,7 +226,7 @@ export class DefaultRepository {
     }
 
     if (migrations['historico_acoes'] == null) {
-      await this.db.exec(`DROP TABLE "historico_acoes"`);
+      await this.db.exec(`DROP TABLE IF EXISTS "historico_acoes"`);
       await this.db.exec(`CREATE TABLE IF NOT EXISTS "historico_acoes" ("id" INTEGER NOT NULL,"codigo" TEXT NOT NULL,"date" DATETIME NOT NULL,"open" REAL NULL,"high" REAL NULL,"low" REAL NULL,"close" REAL NULL,"adjustedClose" REAL NULL,"volume" REAL NULL,"intervalo" TEXT NOT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
       migrations['historico_acoes'] = RUNNED_MIGRATION_CODE;
     }

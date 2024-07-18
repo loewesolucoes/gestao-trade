@@ -29,14 +29,13 @@ export class HistoricoAcoesRepository extends DefaultRepository {
     FROM acoes a
     WHERE a."active" = 1;
 
-    SELECT h.*
+    SELECT h.*, MAX(h.date) AS date
     FROM acoes a
     JOIN historico_acoes h
       ON a.codigo = h.codigo
     WHERE a."active" = 1
       AND h."intervalo" = $intervalo
-    ORDER BY h.date desc
-    LIMIT 1;
+    GROUP BY h.codigo;
     `;
 
     const result = await this.db.exec(query, { $intervalo: intervalo });
