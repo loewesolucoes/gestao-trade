@@ -2,8 +2,10 @@ import { GestaoMessage, WorkersActions } from "./common";
 import { WorkerDatabaseConnector } from "./db-connector";
 import { ParametrosRepository } from "../repositories/parametros";
 import moment from "moment";
-import { HistoricoAcoesRepository } from "../repositories/historico-acoes";
+import { HistoricoAcoes, HistoricoAcoesRepository, IntervaloHistoricoAcoes } from "../repositories/historico-acoes";
 import { NotificationUtil } from "../utils/notification";
+import { TableNames } from "../repositories/default";
+import BigNumber from "bignumber.js";
 
 /* eslint-disable no-restricted-globals */
 console.debug('yahoo-worker start');
@@ -36,38 +38,78 @@ async function loadAll(data: GestaoMessage) {
   const lastUpdateParam = await paramsRepository.getByKey(YAHOO_LAST_UPDATE_KEY)
   const lastUpdate = moment(lastUpdateParam?.valor);
   const passou14Dias = moment(new Date()).add(-14, "days").isSameOrAfter(lastUpdate);
+  const intervalo = IntervaloHistoricoAcoes.UM_DIA;
+
+  const acoesQuePrecisamAtualizar = await repository.ultimasAtualizacoes(intervalo);
+
+  console.log(acoesQuePrecisamAtualizar);
+  
 
   if (true) {
     console.debug('calling yahoo');
 
-    try {
-      const rawResponse = await fetch('https://query1.finance.yahoo.com/v7/finance/download/PETR3.SA?period1=-2208988800&period2=1720569600&interval=1d&events=history');
+    const periodStart = moment("1900-01-01", 'YYYY-MM-DD');
+    const periodEnd = moment(new Date()).add(1, 'day');
+    const stockSymbol = 'PETR3';
 
-      if (rawResponse.ok && rawResponse?.body != null) {
-        const response = await rawResponse.text()
-        const lines = response.split('\n')
+    const records = await downloadHistoricalDataAndParse(stockSymbol, periodStart, periodEnd, intervalo);
 
-        for (let index = 0; index < lines.length; index++) {
-          const element = lines[index];
-          //
-        }
-      } else {
-        console.error('Yahoo status error', rawResponse);
-
-        NotificationUtil.send('Erro ao integrar com o serviço yahoo');
-      }
-
-    } catch (ex) {
-      console.error('Enable cors', ex);
-
-      NotificationUtil.send('Você esta sem conexão a internet ou precisa habilitar a extensão <a href="https://webextension.org/listing/access-control.html" target="_blank">Cors Unblock</a> para usar a aplicação')
-    }
+    if (records.length > 0) {
+      repository.saveAll(TableNames.HISTORICO_ACOES, records);
+    } else console.debug('not needed to call yahoo;')
 
     console.debug('end calling yahoo');
   } else console.debug('not needed to call yahoo;')
 
 
   self.postMessage({ id: data.id, response: { success: true } });
+}
+
+async function downloadHistoricalDataAndParse(stockSymbol: string, periodStart: moment.Moment, periodEnd: moment.Moment, intervalo: IntervaloHistoricoAcoes) {
+  const records: HistoricoAcoes[] = [];
+
+  try {
+    const rawResponse = await fetch(`https://query1.finance.yahoo.com/v7/finance/download/${stockSymbol}.SA?period1=${periodStart.unix()}&period2=${periodEnd.unix()}&interval=${intervalo}&events=history`);
+
+    if (rawResponse.ok && rawResponse?.body != null) {
+      const response = await rawResponse.text();
+      const lines = response.split('\n');
+
+
+      for (let index = 1; index < lines.length; index++) {
+        const line = lines[index];
+
+        const cols = line.split(',');
+
+        const rec: HistoricoAcoes = { codigo: stockSymbol } as HistoricoAcoes;
+
+        try {
+          rec.date = moment(cols[0], 'YYYY-MM-DD').toDate();
+          rec.open = BigNumber(cols[1]);
+          rec.high = BigNumber(cols[2]);
+          rec.low = BigNumber(cols[3]);
+          rec.close = BigNumber(cols[4]);
+          rec.adjustedClose = BigNumber(cols[5]);
+          rec.volume = BigNumber(cols[6]);
+          rec.intervalo = intervalo;
+
+          records.push(rec);
+        } catch (ex) {
+          console.error('Erro ao fazer parse da linha => ', index, line, ex);
+        }
+      }
+    } else {
+      console.error('Yahoo status error', rawResponse);
+
+      NotificationUtil.send('Erro ao integrar com o serviço yahoo');
+    }
+  } catch (ex) {
+    console.error('Enable cors', ex);
+
+    NotificationUtil.send('Você esta sem conexão a internet ou precisa habilitar a extensão <a href="https://webextension.org/listing/access-control.html" target="_blank">Cors Unblock</a> para usar a aplicação')
+  }
+
+  return records;
 }
 
 

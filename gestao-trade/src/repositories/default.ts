@@ -13,6 +13,7 @@ export enum MapperTypes {
 
 export enum TableNames {
   ACOES = "acoes",
+  HISTORICO_ACOES = "historico_acoes",
   PARAMETROS = "parametros",
 }
 
@@ -212,6 +213,11 @@ export class DefaultRepository {
     if (migrations['desativar_acoes'] == null) {
       await this.db.exec(`UPDATE acoes SET "active" = 0 WHERE 1 = 1;`);
       migrations['desativar_acoes'] = RUNNED_MIGRATION_CODE;
+    }
+
+    if (migrations['historico_acoes'] == null) {
+      await this.db.exec(`CREATE TABLE IF NOT EXISTS "historico_acoes" ("id" INTEGER NOT NULL,"codigo" TEXT NOT NULL,"date" DATETIME NOT NULL,"open" REAL NOT NULL,"high" REAL NOT NULL,"low" REAL NOT NULL,"close" REAL NOT NULL,"adjustedClose" REAL NOT NULL,"volume" REAL NOT NULL,"intervalo" TEXT NOT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
+      migrations['historico_acoes'] = RUNNED_MIGRATION_CODE;
     }
 
     // TODO: Add parametros iniciais em branco
