@@ -35,31 +35,23 @@ self.onmessage = (event: MessageEvent<GestaoMessage>) => {
  */
 
 async function loadAll(data: GestaoMessage) {
-  const lastUpdateParam = await paramsRepository.getByKey(YAHOO_LAST_UPDATE_KEY)
-  const lastUpdate = moment(lastUpdateParam?.valor);
   const intervalo = IntervaloHistoricoAcoes.UM_DIA;
 
   const acoesIntegracao = await acoesQuePrecisamAtualizar(intervalo);
 
-  console.log(acoesIntegracao);
-
+  console.debug('check if need to call yahoo', acoesIntegracao);
 
   if (acoesIntegracao.length > 0) {
     console.debug('calling yahoo');
 
-    const periodStart = moment("1900-01-01", 'YYYY-MM-DD');
-    const periodEnd = moment(new Date()).add(1, 'day');
-    const stockSymbol = 'PETR3';
-
-    const records = await downloadHistoricalDataAndParse(stockSymbol, periodStart, periodEnd, intervalo);
-
-    if (records.length > 0) {
-      repository.saveAll(TableNames.HISTORICO_ACOES, records);
-    } else console.debug('not needed to call yahoo;')
+    for (let index = 0; index < acoesIntegracao.length; index++) {
+      await downloadAndSaveIfNeed(acoesIntegracao[index]);
+    }
 
     console.debug('end calling yahoo');
   } else console.debug('not needed to call yahoo;')
 
+  console.debug('loadAll:end');
 
   self.postMessage({ id: data.id, response: { success: true } });
 }
@@ -71,9 +63,29 @@ interface IntegracaoHistoricoAcao {
   intervalo: IntervaloHistoricoAcoes
 }
 
+async function downloadAndSaveIfNeed(acaoIntegracao: IntegracaoHistoricoAcao) {
+  const { codigoAcao, periodEnd, periodStart, intervalo } = (acaoIntegracao || {});
+
+  try {
+    const records = await downloadHistoricalDataAndParse(codigoAcao, periodStart, periodEnd, intervalo);
+
+    if (records.length > 0) {
+      await repository.saveAll(TableNames.HISTORICO_ACOES, records);
+
+      console.debug(`yahoo:${codigoAcao} save ok`);
+    } else console.debug(`not needed to save yahoo for: ${codigoAcao}`);
+  } catch (ex) {
+    console.error('Yahoo status error', acaoIntegracao);
+
+    NotificationUtil.send(`Erro ao integrar com o serviço yahoo => ${codigoAcao}`);
+  }
+}
+
 async function acoesQuePrecisamAtualizar(intervalo: IntervaloHistoricoAcoes): Promise<IntegracaoHistoricoAcao[]> {
   const TODAY_DATE = new Date();
   const { ultimasAtualizacoes, ativos } = await repository.ultimasAtualizacoesEAtivos(intervalo);
+
+  console.debug('acoesQuePrecisamAtualizar', ultimasAtualizacoes, ativos);
 
   const dict = ultimasAtualizacoes.reduce((p, n) => { p[n.codigo] = n; return p }, {});
 
@@ -82,7 +94,7 @@ async function acoesQuePrecisamAtualizar(intervalo: IntervaloHistoricoAcoes): Pr
     const acaoIntegracao = {
       periodStart: moment("1900-01-01", 'YYYY-MM-DD'),
       periodEnd: moment(new Date()).add(1, 'day'),
-      codigoAcao: x?.codigo,
+      codigoAcao: x.codigo,
       intervalo: intervalo,
     };
 
@@ -102,13 +114,20 @@ async function acoesQuePrecisamAtualizar(intervalo: IntervaloHistoricoAcoes): Pr
 async function downloadHistoricalDataAndParse(stockSymbol: string, periodStart: moment.Moment, periodEnd: moment.Moment, intervalo: IntervaloHistoricoAcoes) {
   const records: HistoricoAcoes[] = [];
 
+  console.debug('downloadHistoricalDataAndParse start')
+
   try {
     const rawResponse = await fetch(`https://query1.finance.yahoo.com/v7/finance/download/${stockSymbol}.SA?period1=${periodStart.unix()}&period2=${periodEnd.unix()}&interval=${intervalo}&events=history`);
 
+    console.debug(`yahoo:${stockSymbol} fetch done`)
+
     if (rawResponse.ok && rawResponse?.body != null) {
+      console.debug(`yahoo:${stockSymbol} fetch ok`)
+
       const response = await rawResponse.text();
       const lines = response.split('\n');
 
+      console.debug(`yahoo:${stockSymbol} parse fetch start`)
 
       for (let index = 1; index < lines.length; index++) {
         const line = lines[index];
@@ -132,6 +151,8 @@ async function downloadHistoricalDataAndParse(stockSymbol: string, periodStart: 
           console.error('Erro ao fazer parse da linha => ', index, line, ex);
         }
       }
+
+      console.debug(`yahoo:${stockSymbol} parse fetch end`)
     } else {
       console.error('Yahoo status error', rawResponse);
 

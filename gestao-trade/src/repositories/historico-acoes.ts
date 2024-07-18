@@ -11,12 +11,12 @@ export enum IntervaloHistoricoAcoes {
 export interface HistoricoAcoes extends DefaultFields {
   codigo: string;
   date: Date;
-  open: BigNumber;
-  high: BigNumber;
-  low: BigNumber;
-  close: BigNumber;
-  adjustedClose: BigNumber;
-  volume: BigNumber;
+  open?: BigNumber;
+  high?: BigNumber;
+  low?: BigNumber;
+  close?: BigNumber;
+  adjustedClose?: BigNumber;
+  volume?: BigNumber;
   intervalo: IntervaloHistoricoAcoes
 }
 
@@ -25,6 +25,10 @@ export class HistoricoAcoesRepository extends DefaultRepository {
 
   public async ultimasAtualizacoesEAtivos(intervalo: IntervaloHistoricoAcoes): Promise<{ ultimasAtualizacoes: HistoricoAcoes[], ativos: Acoes[] }> {
     const query = `
+    SELECT *
+    FROM acoes a
+    WHERE a."active" = 1;
+
     SELECT h.*
     FROM acoes a
     JOIN historico_acoes h
@@ -33,10 +37,6 @@ export class HistoricoAcoesRepository extends DefaultRepository {
       AND h."intervalo" = $intervalo
     ORDER BY h.date desc
     LIMIT 1;
-
-    SELECT *
-    FROM acoes a
-    WHERE a."active" = 1;
     `;
 
     const result = await this.db.exec(query, { $intervalo: intervalo });
@@ -44,8 +44,8 @@ export class HistoricoAcoesRepository extends DefaultRepository {
     const parsed = this.parseSqlResultToObj(result, this.HISTORICO_ACOES_MAPPING);
 
     return {
-      ultimasAtualizacoes: parsed[0] || [],
-      ativos: parsed[1] || [],
+      ativos: parsed[0] || [],
+      ultimasAtualizacoes: parsed[1] || [],
     };
   }
 }

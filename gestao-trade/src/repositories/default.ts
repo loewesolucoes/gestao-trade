@@ -216,7 +216,8 @@ export class DefaultRepository {
     }
 
     if (migrations['historico_acoes'] == null) {
-      await this.db.exec(`CREATE TABLE IF NOT EXISTS "historico_acoes" ("id" INTEGER NOT NULL,"codigo" TEXT NOT NULL,"date" DATETIME NOT NULL,"open" REAL NOT NULL,"high" REAL NOT NULL,"low" REAL NOT NULL,"close" REAL NOT NULL,"adjustedClose" REAL NOT NULL,"volume" REAL NOT NULL,"intervalo" TEXT NOT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
+      await this.db.exec(`DROP TABLE "historico_acoes"`);
+      await this.db.exec(`CREATE TABLE IF NOT EXISTS "historico_acoes" ("id" INTEGER NOT NULL,"codigo" TEXT NOT NULL,"date" DATETIME NOT NULL,"open" REAL NULL,"high" REAL NULL,"low" REAL NULL,"close" REAL NULL,"adjustedClose" REAL NULL,"volume" REAL NULL,"intervalo" TEXT NOT NULL, "createdDate" DATETIME NOT NULL, "updatedDate" DATETIME NULL DEFAULT NULL,PRIMARY KEY ("id"));`);
       migrations['historico_acoes'] = RUNNED_MIGRATION_CODE;
     }
 
