@@ -37,15 +37,14 @@ self.onmessage = (event: MessageEvent<GestaoMessage>) => {
 async function loadAll(data: GestaoMessage) {
   const lastUpdateParam = await paramsRepository.getByKey(YAHOO_LAST_UPDATE_KEY)
   const lastUpdate = moment(lastUpdateParam?.valor);
-  const passou14Dias = moment(new Date()).add(-14, "days").isSameOrAfter(lastUpdate);
   const intervalo = IntervaloHistoricoAcoes.UM_DIA;
 
-  const acoesQuePrecisamAtualizar = await repository.ultimasAtualizacoes(intervalo);
+  const acoesIntegracao = await acoesQuePrecisamAtualizar(intervalo);
 
-  console.log(acoesQuePrecisamAtualizar);
-  
+  console.log(acoesIntegracao);
 
-  if (true) {
+
+  if (acoesIntegracao.length > 0) {
     console.debug('calling yahoo');
 
     const periodStart = moment("1900-01-01", 'YYYY-MM-DD');
@@ -63,6 +62,41 @@ async function loadAll(data: GestaoMessage) {
 
 
   self.postMessage({ id: data.id, response: { success: true } });
+}
+
+interface IntegracaoHistoricoAcao {
+  periodStart: moment.Moment
+  periodEnd: moment.Moment
+  codigoAcao: string
+  intervalo: IntervaloHistoricoAcoes
+}
+
+async function acoesQuePrecisamAtualizar(intervalo: IntervaloHistoricoAcoes): Promise<IntegracaoHistoricoAcao[]> {
+  const TODAY_DATE = new Date();
+  const { ultimasAtualizacoes, ativos } = await repository.ultimasAtualizacoesEAtivos(intervalo);
+
+  const dict = ultimasAtualizacoes.reduce((p, n) => { p[n.codigo] = n; return p }, {});
+
+  return ativos.map(x => {
+    const historico = dict[x.codigo] as HistoricoAcoes;
+    const acaoIntegracao = {
+      periodStart: moment("1900-01-01", 'YYYY-MM-DD'),
+      periodEnd: moment(new Date()).add(1, 'day'),
+      codigoAcao: x?.codigo,
+      intervalo: intervalo,
+    };
+
+    if (historico != null) {
+      acaoIntegracao.periodStart = moment(historico.createdDate);
+
+      if (acaoIntegracao.periodStart.isSame(TODAY_DATE, "day")) {
+        // @ts-ignore
+        acaoIntegracao.codigoAcao = undefined;
+      }
+    }
+
+    return acaoIntegracao
+  }).filter(x => x.codigoAcao != null)
 }
 
 async function downloadHistoricalDataAndParse(stockSymbol: string, periodStart: moment.Moment, periodEnd: moment.Moment, intervalo: IntervaloHistoricoAcoes) {

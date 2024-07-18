@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import { DefaultFields, DefaultRepository } from "./default";
+import { Acoes } from "./acoes";
 
 export enum IntervaloHistoricoAcoes {
   UM_MINUTO = '1m',
@@ -22,7 +23,7 @@ export interface HistoricoAcoes extends DefaultFields {
 export class HistoricoAcoesRepository extends DefaultRepository {
   public readonly HISTORICO_ACOES_MAPPING = { ...this.DEFAULT_MAPPING };
 
-  public async ultimasAtualizacoes(intervalo: IntervaloHistoricoAcoes) {
+  public async ultimasAtualizacoesEAtivos(intervalo: IntervaloHistoricoAcoes): Promise<{ ultimasAtualizacoes: HistoricoAcoes[], ativos: Acoes[] }> {
     const query = `
     SELECT h.*
     FROM acoes a
@@ -32,12 +33,19 @@ export class HistoricoAcoesRepository extends DefaultRepository {
       AND h."intervalo" = $intervalo
     ORDER BY h.date desc
     LIMIT 1;
+
+    SELECT *
+    FROM acoes a
+    WHERE a."active" = 1;
     `;
 
     const result = await this.db.exec(query, { $intervalo: intervalo });
 
     const parsed = this.parseSqlResultToObj(result, this.HISTORICO_ACOES_MAPPING);
 
-    return parsed[0] || [];
+    return {
+      ultimasAtualizacoes: parsed[0] || [],
+      ativos: parsed[1] || [],
+    };
   }
 }
