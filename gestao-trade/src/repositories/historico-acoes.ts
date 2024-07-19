@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import { DefaultFields, DefaultRepository } from "./default";
 import { Acoes } from "./acoes";
+import moment from "moment";
 
 export enum IntervaloHistoricoAcoes {
   UM_MINUTO = '1m',
@@ -17,6 +18,15 @@ export interface HistoricoAcoes extends DefaultFields {
   close?: BigNumber;
   adjustedClose?: BigNumber;
   volume?: BigNumber;
+  intervalo: IntervaloHistoricoAcoes
+}
+
+export interface IntegracaoHistoricoAcao {
+  periodStart: moment.Moment
+  periodEnd: moment.Moment
+  codigoAcao: string
+  logoAcao?: string
+  idAcao: number
   intervalo: IntervaloHistoricoAcoes
 }
 
@@ -46,5 +56,37 @@ export class HistoricoAcoesRepository extends DefaultRepository {
       ativos: parsed[0] || [],
       ultimasAtualizacoes: parsed[1] || [],
     };
+  }
+
+  public async acoesQuePrecisamAtualizar(intervalo: IntervaloHistoricoAcoes): Promise<IntegracaoHistoricoAcao[]> {
+    const TODAY_DATE = new Date();
+    const { ultimasAtualizacoes, ativos } = await this.ultimasAtualizacoesEAtivos(intervalo);
+
+    console.debug('ultimasAtualizacoesEAtivos', ultimasAtualizacoes, ativos);
+
+    const dict = ultimasAtualizacoes.reduce((p, n) => { p[n.codigo] = n; return p }, {});
+
+    return ativos.map(x => {
+      const historico = dict[x.codigo] as HistoricoAcoes;
+      const acaoIntegracao = {
+        periodStart: moment("1900-01-01", 'YYYY-MM-DD'),
+        periodEnd: moment(new Date()).add(1, 'day'),
+        codigoAcao: x.codigo,
+        logoAcao: x.logo,
+        idAcao: x.id,
+        intervalo: intervalo,
+      };
+
+      if (historico != null) {
+        acaoIntegracao.periodStart = moment(historico.createdDate);
+
+        if (acaoIntegracao.periodStart.isSame(TODAY_DATE, "day")) {
+          // @ts-ignore
+          acaoIntegracao.codigoAcao = undefined;
+        }
+      }
+
+      return acaoIntegracao
+    }).filter(x => x.codigoAcao != null)
   }
 }

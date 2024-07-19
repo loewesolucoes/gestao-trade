@@ -2,7 +2,7 @@ import { GestaoMessage, WorkersActions } from "./common";
 import { WorkerDatabaseConnector } from "./db-connector";
 import { ParametrosRepository } from "../repositories/parametros";
 import moment from "moment";
-import { HistoricoAcoes, HistoricoAcoesRepository, IntervaloHistoricoAcoes } from "../repositories/historico-acoes";
+import { HistoricoAcoes, HistoricoAcoesRepository, IntegracaoHistoricoAcao, IntervaloHistoricoAcoes } from "../repositories/historico-acoes";
 import { NotificationUtil } from "../utils/notification";
 import { TableNames } from "../repositories/default";
 import BigNumber from "bignumber.js";
@@ -37,7 +37,7 @@ self.onmessage = (event: MessageEvent<GestaoMessage>) => {
 async function loadAll(data: GestaoMessage) {
   const intervalo = IntervaloHistoricoAcoes.UM_DIA;
 
-  const acoesIntegracao = await acoesQuePrecisamAtualizar(intervalo);
+  const acoesIntegracao = await repository.acoesQuePrecisamAtualizar(intervalo);
 
   console.debug('check if need to call yahoo', acoesIntegracao);
 
@@ -54,13 +54,6 @@ async function loadAll(data: GestaoMessage) {
   console.debug('loadAll:end');
 
   self.postMessage({ id: data.id, response: { success: true } });
-}
-
-interface IntegracaoHistoricoAcao {
-  periodStart: moment.Moment
-  periodEnd: moment.Moment
-  codigoAcao: string
-  intervalo: IntervaloHistoricoAcoes
 }
 
 async function downloadAndSaveIfNeed(acaoIntegracao: IntegracaoHistoricoAcao) {
@@ -80,36 +73,6 @@ async function downloadAndSaveIfNeed(acaoIntegracao: IntegracaoHistoricoAcao) {
 
     NotificationUtil.send(`Erro ao integrar com o serviço yahoo => ${codigoAcao}`);
   }
-}
-
-async function acoesQuePrecisamAtualizar(intervalo: IntervaloHistoricoAcoes): Promise<IntegracaoHistoricoAcao[]> {
-  const TODAY_DATE = new Date();
-  const { ultimasAtualizacoes, ativos } = await repository.ultimasAtualizacoesEAtivos(intervalo);
-
-  console.debug('acoesQuePrecisamAtualizar', ultimasAtualizacoes, ativos);
-
-  const dict = ultimasAtualizacoes.reduce((p, n) => { p[n.codigo] = n; return p }, {});
-
-  return ativos.map(x => {
-    const historico = dict[x.codigo] as HistoricoAcoes;
-    const acaoIntegracao = {
-      periodStart: moment("1900-01-01", 'YYYY-MM-DD'),
-      periodEnd: moment(new Date()).add(1, 'day'),
-      codigoAcao: x.codigo,
-      intervalo: intervalo,
-    };
-
-    if (historico != null) {
-      acaoIntegracao.periodStart = moment(historico.createdDate);
-
-      if (acaoIntegracao.periodStart.isSame(TODAY_DATE, "day")) {
-        // @ts-ignore
-        acaoIntegracao.codigoAcao = undefined;
-      }
-    }
-
-    return acaoIntegracao
-  }).filter(x => x.codigoAcao != null)
 }
 
 async function downloadHistoricalDataAndParse(stockSymbol: string, periodStart: moment.Moment, periodEnd: moment.Moment, intervalo: IntervaloHistoricoAcoes) {

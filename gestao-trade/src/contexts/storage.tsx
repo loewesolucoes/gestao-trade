@@ -8,8 +8,10 @@ import { RepositoryUtil } from "../utils/repository";
 import { DefaultRepository } from "../repositories/default";
 import { ParametrosRepository } from "../repositories/parametros";
 import { AcoesRepository } from "../repositories/acoes";
+import { HistoricoAcoesRepository } from "../repositories/historico-acoes";
 
 interface Repo extends DefaultRepository {
+  historicoAcoes: HistoricoAcoesRepository;
   acoes: AcoesRepository;
   params: ParametrosRepository
 }
@@ -57,9 +59,10 @@ export function StorageProvider(props: any) {
 
     // @ts-ignore
     const sqldb = repository.db;
-    
+
     repository.params = new ParametrosRepository(sqldb);
     repository.acoes = new AcoesRepository(sqldb);
+    repository.historicoAcoes = new HistoricoAcoesRepository(sqldb);
 
     setRepository(repository);
     setIsDbOk(true);

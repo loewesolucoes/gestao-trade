@@ -1,8 +1,11 @@
 import './index.scss';
 import { Layout } from '../../shared/layout';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntegration } from '../../contexts/integration';
 import { Loader } from '../../components/loader';
+import { useStorage } from '../../contexts/storage';
+import { IntegracaoHistoricoAcao, IntervaloHistoricoAcoes } from '../../repositories/historico-acoes';
+import { AcaoCard } from '../acoes/acao-card/acao-card';
 
 export default function () {
   const { isLoadingIntegration } = useIntegration();
@@ -22,6 +25,21 @@ export default function () {
 }
 function CardsDaIntegracao() {
   const { loadAll } = useIntegration();
+  const { repository, isDbOk } = useStorage();
+  const [isLoading, setIsLoading] = useState(true)
+  const [acoesQuePrecisamAtualizar, setAcoesQuePrecisamAtualizar] = useState<IntegracaoHistoricoAcao[]>([])
+
+  useEffect(() => {
+    isDbOk && load();
+  }, [isDbOk]);
+
+  async function load() {
+    setIsLoading(true);
+    const result = await repository.historicoAcoes.acoesQuePrecisamAtualizar(IntervaloHistoricoAcoes.UM_DIA);
+
+    setAcoesQuePrecisamAtualizar(result);
+    setIsLoading(false);
+  }
 
   return <div className='d-flex gap-3 flex-column'>
     <div className="card">
@@ -39,10 +57,21 @@ function CardsDaIntegracao() {
     <div className="card">
       <h4 className="card-header d-flex justify-content-between">
         Yahoo
-        <button type='button' className='btn btn-secondary'>Integrar BRAPI</button>
+        <button type='button' className='btn btn-secondary'>Integrar Yahoo</button>
       </h4>
       <div className="card-body">
         <h5 className="card-title">Ações que precisam integrar</h5>
+        {acoesQuePrecisamAtualizar == null ? <div className="alert alert-info">Carregando ações ativas...</div>
+          : (
+            acoesQuePrecisamAtualizar.length === 0 ? (<div className="alert alert-info">Nenhuma ação ativa...</div>) : (
+              <div className="stocks">
+                {acoesQuePrecisamAtualizar.map(x => ({codigo: x.codigoAcao, logo: x.logoAcao})).map(x => (
+                  <AcaoCard key={x.codigo} acao={x as any} isActive={false} onClick={alert} />
+                ))}
+              </div>
+            )
+          )
+        }
       </div>
     </div>
     <div className="card">
