@@ -1,30 +1,29 @@
 import { useEnv } from "../contexts/env";
 
-// icons from https://icons.getbootstrap.com/
-// import HouseFillIcon from "../../../public/house-fill.svg";
-// import CardListIcon from "../../../public/card-list.svg";
-// import GraphUpArrowIcon from "../../../public/graph-up-arrow.svg";
-// import GearFillIcon from "../../../public/gear-fill.svg";
-// import ThreeDotsIcon from "../../../public/three-dots.svg";
 import { useState } from "react";
 import { NavbarCollapse } from "./navbar-collapse";
 import { Link, useLocation } from "react-router-dom";
+
+import { ReactComponent as HouseFillIcon } from "./house-fill.svg";
+import { ReactComponent as ThreeDotsIcon } from "./three-dots.svg";
+import { ReactComponent as GearFillIcon } from "./gear-fill.svg";
+import { ReactComponent as GraphUpArrowIcon } from "./graph-up-arrow.svg";
 
 const pages = [
   {
     name: 'Início',
     path: '/',
-    icon: '⚙️',
+    icon: <HouseFillIcon style={{ width: 22 }} />,
   },
   {
-    name: 'Notas',
-    path: '/notas',
-    icon: '⚙️',
+    name: 'Ações',
+    path: '/acoes',
+    icon: <GraphUpArrowIcon style={{ width: 22 }} />,
   },
   {
-    name: 'Metas',
-    path: '/metas',
-    icon: '⚙️',
+    name: 'Configurações',
+    path: '/configuracoes',
+    icon: <GearFillIcon style={{ width: 22 }} />,
   },
 ]
 
@@ -50,8 +49,7 @@ export function BottomNavbar() {
               ))}
               <button type="button" className={`btn btn-light rounded-0`} aria-expanded="false" aria-label="Toggle navigation" onClick={e => setShow(!show)}>
                 <div className="d-flex flex-column align-items-center justify-content-center">
-                  {'...'}
-                  {/* <ThreeDotsIcon style={{ width: 22 }} /> */}
+                  <ThreeDotsIcon style={{ width: 22 }} />
                   <span>Mais</span>
                 </div>
               </button>

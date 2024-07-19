@@ -6,6 +6,7 @@ import { Loader } from '../../components/loader';
 import { useStorage } from '../../contexts/storage';
 import { IntegracaoHistoricoAcao, IntervaloHistoricoAcoes } from '../../repositories/historico-acoes';
 import { AcaoCard } from '../acoes/acao-card/acao-card';
+import { ReactComponent as ArrowClockWise } from "./arrow-clockwise.svg";
 
 export default function () {
   const { isLoadingIntegration } = useIntegration();
@@ -47,17 +48,17 @@ function CardsDaIntegracao() {
         Geral
       </h4>
       <div className="card-body">
-        <div className='d-flex gap-3 '>
-          <button type='button' className='btn btn-primary' onClick={loadAll}>Carregar todas integrações</button>
-          <button type='button' className='btn btn-secondary'>Carregar tudo do BRAPI</button>
-          <button type='button' className='btn btn-secondary'>Carregar tudo do Yahoo</button>
+        <div className='d-flex gap-3 flex-column flex-lg-row'>
+          <button type='button' className='btn btn-primary' onClick={loadAll}><ArrowClockWise /> Carregar todas integrações</button>
+          <button type='button' className='btn btn-secondary'><ArrowClockWise /> Carregar tudo do BRAPI</button>
+          <button type='button' className='btn btn-secondary'><ArrowClockWise /> Carregar tudo do Yahoo</button>
         </div>
       </div>
     </div>
     <div className="card">
       <h4 className="card-header d-flex justify-content-between">
         Yahoo
-        <button type='button' className='btn btn-secondary'>Integrar Yahoo</button>
+        <button type='button' className='btn btn-secondary'><ArrowClockWise /> Integrar Yahoo</button>
       </h4>
       <div className="card-body">
         <h5 className="card-title">Ações que precisam integrar</h5>
@@ -79,7 +80,7 @@ function CardsDaIntegracao() {
         BRAPI
       </h4>
       <div className="card-body">
-        <button type='button' className='btn btn-secondary'>Integrar BRAPI</button>
+        <button type='button' className='btn btn-secondary'><ArrowClockWise /> Integrar BRAPI</button>
       </div>
     </div>
   </div>;
