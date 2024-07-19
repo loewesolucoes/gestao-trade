@@ -1,16 +1,16 @@
-import './relatorios.scss';
+import './index.scss';
 import { Layout } from '../../shared/layout';
 import { useEffect } from 'react';
 
-export function Relatorios() {
+export default function () {
   useEffect(() => {
-    document.title = `Relatórios | ${process.env.REACT_APP_TITLE}`
+    document.title = `Perguntas frequentes | ${process.env.REACT_APP_TITLE}`
   }, []);
 
   return (
     <Layout>
       <section className='container'>
-        <h1>Relatórios</h1>
+        <h1>404: Pagina não encontrada</h1>
         <p>Pagina em contrução</p>
       </section>
     </Layout>

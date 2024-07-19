@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import './home.scss';
+import './index.scss';
 import { Layout } from '../../shared/layout';
 import { useEffect, useState } from 'react';
 import { Acoes } from '../../repositories/acoes';
@@ -10,7 +10,7 @@ import { NotificationUtil } from '../../utils/notification';
 
 interface HistoricoAcao { }
 
-export function Home() {
+export default function () {
   const [acoes, setAcoes] = useState<Acoes[]>();
   const [acaoEscolhida, setAcaoEscolhida] = useState<string>();
   const [historico, setHistorico] = useState<HistoricoAcao[]>([]);
@@ -32,8 +32,6 @@ export function Home() {
 
   async function load() {
     const acoes = await repository.acoes.listActives();
-
-    NotificationUtil.send('teste');
 
     setAcoes(acoes);
   }

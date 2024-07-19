@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AppProviders } from './contexts';
+import { Loader } from './components/loader';
 
-import { Home, Configuracoes, FAQ, Relatorios, AcoesPage, NotFound } from './pages';
+const Home = React.lazy(() => import("./pages/home"));
+const Configuracoes = React.lazy(() => import("./pages/configuracoes"));
+const AcoesPage = React.lazy(() => import("./pages/acoes"));
+const FAQ = React.lazy(() => import("./pages/faq"));
+const IntegracaoPage = React.lazy(() => import("./pages/integracao"));
+const NotFound = React.lazy(() => import("./pages/not-found"));
+const Relatorios = React.lazy(() => import("./pages/relatorios"));
 
 const router = createBrowserRouter([
   {
@@ -29,6 +36,10 @@ const router = createBrowserRouter([
     element: <FAQ />,
   },
   {
+    path: "/integracoes",
+    element: <IntegracaoPage />,
+  },
+  {
     path: "*",
     element: <NotFound />,
   },
@@ -42,7 +53,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <AppProviders>
-    <RouterProvider router={router} />
+    <Suspense fallback={<Loader />}>
+      <RouterProvider router={router} />
+    </Suspense>
   </AppProviders>
 );
 

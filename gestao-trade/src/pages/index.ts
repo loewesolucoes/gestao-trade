@@ -1,6 +1,0 @@
-export { AcoesPage } from './acoes/acoes'
-export { Configuracoes } from './configuracoes/configuracoes'
-export { FAQ } from './faq/faq'
-export { Home } from './home/home'
-export { NotFound } from './not-found/not-found'
-export { Relatorios } from './relatorios/relatorios'

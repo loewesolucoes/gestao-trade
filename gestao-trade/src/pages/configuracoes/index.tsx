@@ -1,4 +1,4 @@
-import './configuracoes.scss';
+import './index.scss';
 import { Layout } from '../../shared/layout';
 import { Loader } from '../../components/loader';
 import { useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import { Parametro } from '../../repositories/parametros';
 import { Input } from '../../components/input';
 import { AuthButton } from '../../components/auth-button';
 
-export function Configuracoes() {
+export default function () {
   const [isLoading, setIsLoading] = useState(false);
   const { isDbOk, exportOriginalDumpToFileAndDownload, importOriginalDumpFromFile, repository, refresh } = useStorage();
   const { aplicationName } = useEnv()

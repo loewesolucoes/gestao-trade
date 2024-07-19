@@ -1,4 +1,4 @@
-import './acoes.scss';
+import './index.scss';
 import { Layout } from '../../shared/layout';
 import { useEffect, useState } from 'react';
 import { PaginationControl } from '../../components/pagination';
@@ -14,7 +14,7 @@ const SEARCH_PARAM_NAME = "q";
 
 let debounceLoad: any = null;
 
-export function AcoesPage() {
+export default function () {
   const [searchStr, setSearchStr] = useState<string>('');
   const [acoes, setAcoes] = useState<Acoes[]>([]);
   const [take, setTake] = useState<number>(25);

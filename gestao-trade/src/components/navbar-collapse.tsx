@@ -11,6 +11,10 @@ const pages = [
     path: '/acoes'
   },
   {
+    name: 'Integrações',
+    path: '/integracoes'
+  },
+  {
     name: 'Relatórios',
     path: '/relatorios'
   },
