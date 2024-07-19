@@ -4,14 +4,18 @@ import React, { createContext, useState, useEffect } from "react"
 import { BrapiService } from "../services/brapi";
 import { useStorage } from "./storage";
 import { YahooService } from "../services/yahoo";
+import { NotificationUtil } from "../utils/notification";
 
 const IntegrationContext = createContext({
-  isRunning: true,
+  isRunningAll: false,
+  isLoadingIntegration: true,
+  loadAll: () => console.warn('not load yet'),
 });
 
 export function IntegrationProvider(props: any) {
   const { isDbOk } = useStorage();
-  const [isRunning, setIsRunning] = useState(false);
+  const [isLoadingIntegration, setIsLoadingIntegration] = useState(true);
+  const [isRunningAll, setIsRunningAll] = useState(false);
   const [brapiService, setBrapiService] = useState<BrapiService>();
   const [yahooService, setYahooService] = useState<YahooService>();
 
@@ -23,25 +27,43 @@ export function IntegrationProvider(props: any) {
   }, [isDbOk]);
 
   useEffect(() => {
-    load();
-  }, [brapiService, yahooService]);
-
-  async function load() {
     if (brapiService == null || yahooService == null) return;
 
-    await brapiService.loadAll();
+    setIsLoadingIntegration(false);
+  }, [brapiService, yahooService]);
+
+  async function loadAll() {
+    setIsRunningAll(true);
+
+    await loadBrapi();
+    await loadYahoo();
+
+    setIsRunningAll(false);
+  }
+
+  async function loadYahoo() {
+    if (yahooService == null) return NotificationUtil.send('Ainda não carregou as integrações');
+
     await yahooService.loadAll();
-    setIsRunning(false);
+  }
+
+  async function loadBrapi() {
+    if (brapiService == null) return NotificationUtil.send('Ainda não carregou as integrações');
+
+    await brapiService.loadAll();
   }
 
   return (
     <IntegrationContext.Provider
       value={{
-        isRunning,
+        isRunningAll,
+        isLoadingIntegration,
+        loadAll,
       }}
       {...props}
     />
   )
+
 }
 
 export const useIntegration = () => React.useContext(IntegrationContext)
