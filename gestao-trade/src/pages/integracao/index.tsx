@@ -65,7 +65,7 @@ function CardsDaIntegracao() {
           <h5 className="card-title">Ações que precisam integrar</h5>
           {acoesQuePrecisamAtualizar == null ? <div className="alert alert-info">Carregando ações ativas...</div>
             : (
-              acoesQuePrecisamAtualizar.length === 0 ? (<div className="alert alert-info">Nenhuma ação ativa...</div>) : (
+              acoesQuePrecisamAtualizar.length === 0 ? (<div className="alert alert-info">Nenhuma ação ativa ou que precise atualizar...</div>) : (
                 <div className="stocks">
                   {acoesQuePrecisamAtualizar.map(x => ({ codigo: x.codigoAcao, logo: x.logoAcao })).map(x => (
                     <AcaoCard key={x.codigo} acao={x as any} isActive={false} onClick={alert} />
