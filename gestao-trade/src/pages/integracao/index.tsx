@@ -25,7 +25,7 @@ export default function () {
   );
 }
 function CardsDaIntegracao() {
-  const { loadAll } = useIntegration();
+  const { loadAll, loadBrapi, loadYahoo } = useIntegration();
   const { repository, isDbOk } = useStorage();
   const [isLoading, setIsLoading] = useState(true)
   const [acoesQuePrecisamAtualizar, setAcoesQuePrecisamAtualizar] = useState<IntegracaoHistoricoAcao[]>([])
@@ -42,47 +42,49 @@ function CardsDaIntegracao() {
     setIsLoading(false);
   }
 
-  return <div className='d-flex gap-3 flex-column'>
-    <div className="card">
-      <h4 className="card-header">
-        Geral
-      </h4>
-      <div className="card-body">
-        <div className='d-flex gap-3 flex-column flex-lg-row'>
-          <button type='button' className='btn btn-primary' onClick={loadAll}><ArrowClockWise /> Carregar todas integrações</button>
-          <button type='button' className='btn btn-secondary'><ArrowClockWise /> Carregar tudo do BRAPI</button>
-          <button type='button' className='btn btn-secondary'><ArrowClockWise /> Carregar tudo do Yahoo</button>
+  return isLoading ? <Loader /> : (
+    <div className='d-flex gap-3 flex-column'>
+      <div className="card">
+        <h4 className="card-header">
+          Geral
+        </h4>
+        <div className="card-body">
+          <div className='d-flex gap-3 flex-column flex-lg-row'>
+            <button type='button' className='btn btn-primary' onClick={loadAll}><ArrowClockWise /> Carregar todas integrações</button>
+            <button type='button' className='btn btn-secondary' onClick={loadBrapi}><ArrowClockWise /> Carregar tudo do BRAPI</button>
+            <button type='button' className='btn btn-secondary' onClick={loadYahoo}><ArrowClockWise /> Carregar tudo do Yahoo</button>
+          </div>
+        </div>
+      </div>
+      <div className="card">
+        <h4 className="card-header d-flex justify-content-between">
+          Yahoo
+          <button type='button' className='btn btn-secondary' onClick={loadYahoo}><ArrowClockWise /> Integrar Yahoo</button>
+        </h4>
+        <div className="card-body">
+          <h5 className="card-title">Ações que precisam integrar</h5>
+          {acoesQuePrecisamAtualizar == null ? <div className="alert alert-info">Carregando ações ativas...</div>
+            : (
+              acoesQuePrecisamAtualizar.length === 0 ? (<div className="alert alert-info">Nenhuma ação ativa...</div>) : (
+                <div className="stocks">
+                  {acoesQuePrecisamAtualizar.map(x => ({ codigo: x.codigoAcao, logo: x.logoAcao })).map(x => (
+                    <AcaoCard key={x.codigo} acao={x as any} isActive={false} onClick={alert} />
+                  ))}
+                </div>
+              )
+            )
+          }
+        </div>
+      </div>
+      <div className="card">
+        <h4 className="card-header">
+          BRAPI
+        </h4>
+        <div className="card-body">
+          <button type='button' className='btn btn-secondary' onClick={loadBrapi}><ArrowClockWise /> Integrar BRAPI</button>
         </div>
       </div>
     </div>
-    <div className="card">
-      <h4 className="card-header d-flex justify-content-between">
-        Yahoo
-        <button type='button' className='btn btn-secondary'><ArrowClockWise /> Integrar Yahoo</button>
-      </h4>
-      <div className="card-body">
-        <h5 className="card-title">Ações que precisam integrar</h5>
-        {acoesQuePrecisamAtualizar == null ? <div className="alert alert-info">Carregando ações ativas...</div>
-          : (
-            acoesQuePrecisamAtualizar.length === 0 ? (<div className="alert alert-info">Nenhuma ação ativa...</div>) : (
-              <div className="stocks">
-                {acoesQuePrecisamAtualizar.map(x => ({codigo: x.codigoAcao, logo: x.logoAcao})).map(x => (
-                  <AcaoCard key={x.codigo} acao={x as any} isActive={false} onClick={alert} />
-                ))}
-              </div>
-            )
-          )
-        }
-      </div>
-    </div>
-    <div className="card">
-      <h4 className="card-header">
-        BRAPI
-      </h4>
-      <div className="card-body">
-        <button type='button' className='btn btn-secondary'><ArrowClockWise /> Integrar BRAPI</button>
-      </div>
-    </div>
-  </div>;
+  )
 }
 

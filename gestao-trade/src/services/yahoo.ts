@@ -1,3 +1,5 @@
+import moment from "moment";
+import { NotificationUtil } from "../utils/notification";
 import { WorkersActions } from "../workers/common";
 import { WorkerService } from "./worker";
 
@@ -7,8 +9,11 @@ export class YahooService extends WorkerService {
   }
 
   public async loadAll() {
+    const startTime = Date.now();
     const response = await this.postMessageAndReceive(WorkersActions.LOAD_ALL)
 
-    console.log(response);
+    const endTime = Date.now();
+    console.debug('FIM DA INTEGRAÇÃO DO YAHOO.', response);
+    NotificationUtil.send(`Fim da integração do YAHOO em ${moment.duration(endTime - startTime, 'milliseconds').humanize()}.`);
   }
 }

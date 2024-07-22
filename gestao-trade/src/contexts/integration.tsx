@@ -10,6 +10,8 @@ const IntegrationContext = createContext({
   isRunningAll: false,
   isLoadingIntegration: true,
   loadAll: () => console.warn('not load yet'),
+  loadYahoo: () => console.warn('not load yet'),
+  loadBrapi: () => console.warn('not load yet'),
 });
 
 export function IntegrationProvider(props: any) {
@@ -59,6 +61,8 @@ export function IntegrationProvider(props: any) {
         isRunningAll,
         isLoadingIntegration,
         loadAll,
+        loadYahoo,
+        loadBrapi,
       }}
       {...props}
     />
