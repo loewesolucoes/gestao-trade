@@ -27,6 +27,7 @@ function NotificationItem({ item }: any) {
   return (
     <div className={`toast ${show && 'show'}`} role="alert" aria-live="assertive" aria-atomic="true">
       <div className="toast-header">
+        <img src={`${process.env.PUBLIC_URL}/favicon-16x16.png`} className="rounded me-2" alt="small logo size" />
         <strong className="me-auto">{process.env.REACT_APP_TITLE}</strong>
         {/* <small className="text-body-secondary">just now</small> */}
         <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close" onClick={e => setShow(false)}></button>

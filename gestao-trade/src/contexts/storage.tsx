@@ -9,6 +9,7 @@ import { DefaultRepository } from "../repositories/default";
 import { ParametrosRepository } from "../repositories/parametros";
 import { AcoesRepository } from "../repositories/acoes";
 import { HistoricoAcoesRepository } from "../repositories/historico-acoes";
+import { NotificationUtil } from "../utils/notification";
 
 interface Repo extends DefaultRepository {
   historicoAcoes: HistoricoAcoesRepository;
@@ -127,9 +128,15 @@ export function StorageProvider(props: any) {
     if (!isAuthOk)
       throw new Error('you must login on gdrive')
 
-    await updateGDrive();
+    try {
+      await updateGDrive();
 
-    alert('Dados salvos no Google Drive');
+      NotificationUtil.send('Dados salvos no Google Drive');
+    } catch (ex) {
+      console.error('doGDriveSave error:', ex);
+
+      NotificationUtil.send('Erro ao salvar dados no Google Drive.');
+    }
 
     console.debug('doGDriveSave end');
     setIsGDriveSaveLoading(false);
@@ -144,10 +151,15 @@ export function StorageProvider(props: any) {
     if (!isAuthOk)
       throw new Error('you must login on gdrive')
 
-    await loadGDrive();
+    const file = await loadGDrive();
     console.debug('doGDriveLoad end');
     await refresh();
-    alert('Dados carregados do Google Drive');
+
+    if (file)
+      NotificationUtil.send('Dados carregados do Google Drive.');
+    else
+      NotificationUtil.send('Nenhum arquivo encontrado no Google Drive.');
+
     setIsGDriveLoadLoading(false);
   }
 
@@ -165,6 +177,8 @@ export function StorageProvider(props: any) {
       await RepositoryUtil.persistLocalDump(dump);
       await startStorage()
     }
+
+    return file;
   }
 
   async function updateGDrive() {
@@ -179,6 +193,8 @@ export function StorageProvider(props: any) {
     } else {
       await GDriveUtil.createFile(GDriveUtil.DB_FILE_NAME, dump);
     }
+
+    return file;
   }
 
   return (

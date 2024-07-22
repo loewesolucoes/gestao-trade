@@ -28,7 +28,7 @@ export interface Headers {
 const mimeType = 'application/octet-stream';
 
 export class GDriveUtil {
-  public static readonly DB_FILE_NAME = 'gestao-financeira.settings.db'
+  public static readonly DB_FILE_NAME = 'gestao-trade.settings.db'
   public static async getFirstFileByName(fileName: string): Promise<GDriveFile | undefined> {
     const { result } = await gapi.client.drive.files.list({ q: `fullText contains '"${fileName}"'`, });
 
@@ -60,7 +60,7 @@ export class GDriveUtil {
 
     const json = await response.json()
 
-    console.log('Uploaded. Result:\n' + JSON.stringify(json, null, 2));
+    console.debug('Uploaded. Result:\n' + JSON.stringify(json, null, 2));
 
     return json;
   }
@@ -80,7 +80,7 @@ export class GDriveUtil {
 
     const json = await response.json()
 
-    console.log('Updated. Result:\n' + JSON.stringify(json, null, 2));
+    console.debug('Updated. Result:\n' + JSON.stringify(json, null, 2));
   }
 
   /**
