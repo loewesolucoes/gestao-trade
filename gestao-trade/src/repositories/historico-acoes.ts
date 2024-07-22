@@ -33,6 +33,22 @@ export interface IntegracaoHistoricoAcao {
 export class HistoricoAcoesRepository extends DefaultRepository {
   public readonly HISTORICO_ACOES_MAPPING = { ...this.DEFAULT_MAPPING };
 
+  public async listByCode(codigo: string): Promise<HistoricoAcoes[]> {
+    const query = `
+    SELECT *
+    FROM historico_acoes h
+    WHERE h."codigo" = $codigo
+    GROUP BY h."codigo", h."date"
+    ORDER BY h."date" asc;
+    `;
+
+    const result = await this.db.exec(query, { $codigo: codigo });
+
+    const parsed = this.parseSqlResultToObj(result, this.HISTORICO_ACOES_MAPPING);
+
+    return parsed[0] || [];
+  }
+
   public async ultimasAtualizacoesEAtivos(intervalo: IntervaloHistoricoAcoes): Promise<{ ultimasAtualizacoes: HistoricoAcoes[], ativos: Acoes[] }> {
     const query = `
     SELECT *

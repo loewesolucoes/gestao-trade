@@ -5,10 +5,10 @@ import moment from 'moment';
 
 export interface ChartIntraday {
   time: string,
-  open: number,
-  close: number,
-  high: number,
-  low: number,
+  open?: number,
+  close?: number,
+  high?: number,
+  low?: number,
 }
 
 interface Props {
