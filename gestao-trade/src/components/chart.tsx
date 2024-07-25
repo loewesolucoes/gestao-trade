@@ -11,8 +11,17 @@ export interface ChartIntraday {
   low?: number,
 }
 
-interface Props {
+export interface ChartFiboLines {
+  fibo0: number
+  fibo382: number
+  fibo618: number
+  fibo50: number
+  fibo1000: number
+}
+
+interface CustomProps {
   data: ChartIntraday[],
+  analysis: ChartFiboLines[],
   className?: string,
   visibleFrom?: string,
   visibleTo?: string,
@@ -20,8 +29,8 @@ interface Props {
 
 let chart: import('lightweight-charts').IChartApi;
 
-export const ChartComponent = (props: Props) => {
-  const { data, visibleFrom, visibleTo, ...otherProps } = props;
+export const ChartComponent = (props: CustomProps) => {
+  const { data, analysis, visibleFrom, visibleTo, ...otherProps } = props;
 
   const chartContainerRef = useRef() as any;
 
@@ -60,6 +69,45 @@ export const ChartComponent = (props: Props) => {
     candleSeries.setData(data);
 
     setVisibleRange();
+
+    const x = analysis[analysis.length - 1];
+
+    candleSeries.createPriceLine({
+      price: x.fibo0,
+      color: '#000',
+      title: 'fibo0',
+      lineStyle: 0,
+    })
+    
+    candleSeries.createPriceLine({
+      price: x.fibo382,
+      color: '#000',
+      title: 'fibo382',
+    })
+    
+    candleSeries.createPriceLine({
+      price: x.fibo618,
+      color: '#000',
+      title: 'fibo618',
+    })
+    
+    candleSeries.createPriceLine({
+      price: x.fibo50,
+      color: '#000',
+      title: 'fibo50',
+    })
+    
+    candleSeries.createPriceLine({
+      price: x.fibo1000,
+      color: '#000',
+      title: 'fibo1000',
+      lineStyle: 0,
+    })
+
+    // for (let index = 0; index < analysis.length; index++) {
+    //   const element = analysis[index];
+
+    // }
 
     window.addEventListener('resize', handleResize);
 

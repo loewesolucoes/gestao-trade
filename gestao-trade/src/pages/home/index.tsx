@@ -22,6 +22,7 @@ export default function () {
   const [acoes, setAcoes] = useState<Acoes[]>();
   const [acaoEscolhida, setAcaoEscolhida] = useState<string>();
   const [historico, setHistorico] = useState<ChartIntraday[]>();
+  const [analysis, setAnalysis] = useState<any>();
 
   useEffect(() => {
     document.title = `Início | ${process.env.REACT_APP_TITLE}`
@@ -57,7 +58,22 @@ export default function () {
       low: x.low?.toNumber(),
     })));
 
-    analysisService.run(historico, initialDate, endDate);
+    const analysis = analysisService.run(historico, initialDate, endDate);
+
+    setAnalysis(analysis
+      // @ts-ignore
+      .filter(x => x.movementType !== 'UNCOMPLETED')
+      .map(x => ({
+        ...x,
+        alvo1: x.alvo1?.toNumber(),
+        alvo2: x.alvo2?.toNumber(),
+        alvo3: x.alvo3?.toNumber(),
+        fibo0: x.fibo0?.toNumber(),
+        fibo382: x.fibo382?.toNumber(),
+        fibo618: x.fibo618?.toNumber(),
+        fibo50: x.fibo50?.toNumber(),
+        fibo1000: x.fibo1000?.toNumber(),
+      })));
   }
 
   return (
@@ -88,12 +104,30 @@ export default function () {
           : <>
             <section className="card analysis">
               <div className="card-header">Analise</div>
+              <div className="card-body">
+                {analysis == null ? <div className="alert alert-info">Carregando analises...</div>
+                  : (
+                    <div style={{ "whiteSpace": "pre", maxHeight: 300, overflow: 'auto' }}>{filterAnalysis(analysis)}</div>
+                  )
+                }
+              </div>
             </section>
             {historico == null ? <div className="alert alert-info">Carregando histórico...</div>
-              : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate}></ChartComponent>}
+              : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate} analysis={analysis}></ChartComponent>}
           </>
         }
       </section>
     </Layout>
   );
+}
+
+function filterAnalysis(analysis: any): any {
+  return JSON.stringify(
+    analysis
+      // .filter((x: any) => x.bateuAlvo1)
+      .map((x: any) => {
+        x.movements = undefined;
+        return x;
+      })
+    , null, 4);
 }

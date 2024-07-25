@@ -45,14 +45,13 @@ interface ExtremosData extends HistoricoAcoes {
 }
 
 class AnalysisService {
-  public run(historyOriginal: HistoricoAcoes[], initialDate: string, endDate: string): any {
+  public run(historyOriginal: HistoricoAcoes[], initialDate: string, endDate: string): FiboEAlvos[] {
     if (historyOriginal.length === 0) return [];
     const filteredHistory = historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate));
 
     const toposEFundos = this.toposEFundos(filteredHistory, 2);
     const movementsAlta = this.parseToMovementsTresPontos(toposEFundos, PivosType.ALTA);
     const movementsBaixa = this.parseToMovementsTresPontos(toposEFundos, PivosType.BAIXA);
-    console.log(JSON.stringify(movementsAlta.concat(movementsBaixa)));
     const movementsAltaWithFibo = this.criarFiboEAlvos(movementsAlta);
     const movementsBaixaWithFibo = this.criarFiboEAlvos(movementsBaixa);
 
@@ -68,31 +67,35 @@ class AnalysisService {
         const atual = { ...x };
         const first = atual.movements[0];
         const last = atual.movements[atual.movements.length - 1];
+        const differenceLastHighFirstLow = last.high.minus(first.low);
+
+        atual.dataInicio = first.date;
+        atual.dataFim = last.date;
 
         if (atual.type === MovementType.DESCIDA) {
           atual.fibo0 = first.high; // z
-          atual.fibo382 = first.high - .382 * (last.high - first.low);
-          atual.fibo618 = first.high - .618 * (last.high - first.low);
-          atual.fibo50 = first.high - .50 * (last.high - first.low);
+          atual.fibo382 = first.high.minus((differenceLastHighFirstLow).times(.382));
+          atual.fibo618 = first.high.minus((differenceLastHighFirstLow).times(.618));
+          atual.fibo50 = first.high.minus((differenceLastHighFirstLow).times(.50));
           atual.fibo1000 = last.low; // y
-          atual.alvo1 = ((atual.fibo618 - atual.fibo0) / .618) + atual.fibo618; // y2 = ((x - z) / 0,618) + x
-          atual.bateuAlvo1 = lastDay.low <= atual.alvo1;
-          atual.alvo2 = ((atual.fibo50 - atual.fibo0) / .5) + atual.fibo1000; // y3 = ((x - z) / 0,5) + y
-          atual.bateuAlvo2 = lastDay.low <= atual.alvo2;
-          atual.alvo3 = ((atual.fibo382 - atual.fibo0) / .382) + atual.alvo1; // y4 = ((x - z) / 0,382) + y2
-          atual.bateuAlvo3 = lastDay.low <= atual.alvo3;
+          atual.alvo1 = ((atual.fibo618.minus(atual.fibo0)).div(.618)).plus(atual.fibo618); // y2 = ((x - z) / 0,618) + x
+          atual.bateuAlvo1 = lastDay.low.isLessThanOrEqualTo(atual.alvo1);
+          atual.alvo2 = ((atual.fibo50.minus(atual.fibo0)).div(.5)).plus(atual.fibo1000); // y3 = ((x - z) / 0,5) + y
+          atual.bateuAlvo2 = lastDay.low.isLessThanOrEqualTo(atual.alvo2);
+          atual.alvo3 = ((atual.fibo382.minus(atual.fibo0)).div(.382)).plus(atual.alvo1); // y4 = ((x - z) / 0,382) + y2
+          atual.bateuAlvo3 = lastDay.low.isLessThanOrEqualTo(atual.alvo3);
         } else {
           atual.fibo0 = first.low; // z
-          atual.fibo382 = first.low + .382 * (last.high - first.low);
-          atual.fibo618 = first.low + .618 * (last.high - first.low);
-          atual.fibo50 = first.low + .50 * (last.high - first.low);
+          atual.fibo382 = first.low.plus((differenceLastHighFirstLow.times(.382)));
+          atual.fibo618 = first.low.plus(differenceLastHighFirstLow.times(.618));
+          atual.fibo50 = first.low.plus(differenceLastHighFirstLow.times(.50));
           atual.fibo1000 = last.high; // y
-          atual.alvo1 = ((atual.fibo618 - atual.fibo0) / .618) + atual.fibo618; // y2 = ((x - z) / 0,618) + x
-          atual.bateuAlvo1 = lastDay.high >= atual.alvo1;
-          atual.alvo2 = ((atual.fibo50 - atual.fibo0) / .5) + atual.fibo1000; // y3 = ((x - z) / 0,5) + y
-          atual.bateuAlvo2 = lastDay.high >= atual.alvo2;
-          atual.alvo3 = ((atual.fibo382 - atual.fibo0) / .382) + atual.alvo1; // y4 = ((x - z) / 0,382) + y2
-          atual.bateuAlvo3 = lastDay.high >= atual.alvo3;
+          atual.alvo1 = ((atual.fibo618.minus(atual.fibo0)).div(.618)).plus(atual.fibo618); // y2 = ((x - z) / 0,618) + x
+          atual.bateuAlvo1 = lastDay.high.isGreaterThanOrEqualTo(atual.alvo1);
+          atual.alvo2 = ((atual.fibo50.minus(atual.fibo0)).div(.5)).plus(atual.fibo1000); // y3 = ((x - z) / 0,5) + y
+          atual.bateuAlvo2 = lastDay.high.isGreaterThanOrEqualTo(atual.alvo2);
+          atual.alvo3 = ((atual.fibo382.minus(atual.fibo0)).div(.382)).plus(atual.alvo1); // y4 = ((x - z) / 0,382) + y2
+          atual.bateuAlvo3 = lastDay.high.isGreaterThanOrEqualTo(atual.alvo3);
         }
 
         return atual;
