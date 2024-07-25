@@ -72,64 +72,66 @@ export const ChartComponent = (props: CustomProps) => {
 
     setVisibleRange();
 
-    const x = analysis[analysis.length - 1];
+    for (let index = 0; index < analysis.length; index++) {
+      const x = analysis[index];
+      const currentColor = getRandomColor();
 
-    const lineSerieFibo0 = chart.addLineSeries({
-      color: '#000',
-      title: 'fibo0',
-      lineStyle: 0,
-      priceLineVisible: false,
-    })
+      const lineSerieFibo0 = chart.addLineSeries({
+        color: currentColor,
+        lineStyle: 0,
+        lastValueVisible: false,
+        priceLineVisible: false,
+      })
 
-    lineSerieFibo0.setData([
-      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo0 },
-      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo0 },
-    ])
-    const lineSerieFibo382 = chart.addLineSeries({
-      color: '#000',
-      title: 'fibo382',
-      lineStyle: 2,
-      priceLineVisible: false,
-    })
+      lineSerieFibo0.setData([
+        { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo0 },
+        { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo0 },
+      ])
+      const lineSerieFibo382 = chart.addLineSeries({
+        color: currentColor,
+        lineStyle: 2,
+        lastValueVisible: false,
+        priceLineVisible: false,
+      })
 
-    lineSerieFibo382.setData([
-      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo382 },
-      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo382 },
-    ])
-    const lineSerieFibo618 = chart.addLineSeries({
-      color: '#000',
-      title: 'fibo618',
-      lineStyle: 2,
-      priceLineVisible: false,
-    })
+      lineSerieFibo382.setData([
+        { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo382 },
+        { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo382 },
+      ])
+      const lineSerieFibo618 = chart.addLineSeries({
+        color: currentColor,
+        lineStyle: 2,
+        lastValueVisible: false,
+        priceLineVisible: false,
+      })
 
-    lineSerieFibo618.setData([
-      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo618 },
-      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo618 },
-    ])
-    const lineSerieFibo50 = chart.addLineSeries({
-      color: '#000',
-      title: 'fibo50',
-      lineStyle: 1,
-      priceLineVisible: false,
-    })
+      lineSerieFibo618.setData([
+        { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo618 },
+        { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo618 },
+      ])
+      const lineSerieFibo50 = chart.addLineSeries({
+        color: currentColor,
+        lineStyle: 1,
+        lastValueVisible: false,
+        priceLineVisible: false,
+      })
 
-    lineSerieFibo50.setData([
-      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo50 },
-      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo50 },
-    ])
-    const lineSerieFibo1000 = chart.addLineSeries({
-      color: '#000',
-      title: 'fibo1000',
-      lineStyle: 0,
-      priceLineVisible: false,
-    })
+      lineSerieFibo50.setData([
+        { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo50 },
+        { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo50 },
+      ])
+      const lineSerieFibo1000 = chart.addLineSeries({
+        color: currentColor,
+        lineStyle: 0,
+        lastValueVisible: false,
+        priceLineVisible: false,
+      })
 
-    lineSerieFibo1000.setData([
-      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo1000 },
-      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo1000 },
-    ])
-
+      lineSerieFibo1000.setData([
+        { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo1000 },
+        { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo1000 },
+      ])
+    }
     // candleSeries.createPriceLine({
     //   price: x.fibo382,
     //   color: '#000',
@@ -186,3 +188,12 @@ export const ChartComponent = (props: CustomProps) => {
       {...otherProps} />
   );
 };
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
