@@ -25,19 +25,12 @@ self.onmessage = (event: MessageEvent<GestaoMessage>) => {
 };
 
 async function loadAll(data: GestaoMessage) {
-  const lastUpdateParam = await paramsRepository.getByKey(BRAPI_LAST_UPDATE_KEY)
-  const lastUpdate = moment(lastUpdateParam?.valor);
-  const passou14Dias = moment(new Date()).add(-14, "days").isSameOrAfter(lastUpdate);
+  console.debug('start calling brapi');
 
-  if (lastUpdateParam == null || passou14Dias) {
-    console.debug('calling brapi');
+  await loadAllAndSave();
+  await paramsRepository.set(BRAPI_LAST_UPDATE_KEY, moment(new Date()).toISOString());
 
-    await loadAllAndSave();
-    await paramsRepository.set(BRAPI_LAST_UPDATE_KEY, moment(new Date()).toISOString());
-
-    console.debug('end calling brapi');
-  } else console.debug('not needed to call brapi;')
-
+  console.debug('end calling brapi');
 
   self.postMessage({ id: data.id, response: { success: true } });
 }

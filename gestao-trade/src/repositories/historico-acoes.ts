@@ -75,7 +75,7 @@ export class HistoricoAcoesRepository extends DefaultRepository {
   }
 
   public async acoesQuePrecisamAtualizar(intervalo: IntervaloHistoricoAcoes): Promise<IntegracaoHistoricoAcao[]> {
-    const TODAY_DATE = new Date();
+    const YESTERDAY_DATE = moment(new Date()).add(-1, 'day');
     const { ultimasAtualizacoes, ativos } = await this.ultimasAtualizacoesEAtivos(intervalo);
 
     console.debug('ultimasAtualizacoesEAtivos', ultimasAtualizacoes, ativos);
@@ -94,9 +94,9 @@ export class HistoricoAcoesRepository extends DefaultRepository {
       };
 
       if (historico != null) {
-        acaoIntegracao.periodStart = moment(historico.createdDate);
+        acaoIntegracao.periodStart = moment(historico.createdDate).add(-1, 'day');
 
-        if (acaoIntegracao.periodStart.isSame(TODAY_DATE, "day")) {
+        if (acaoIntegracao.periodStart.isSame(YESTERDAY_DATE, "day")) {
           // @ts-ignore
           acaoIntegracao.codigoAcao = undefined;
         }
