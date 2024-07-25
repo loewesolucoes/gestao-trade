@@ -17,6 +17,8 @@ export interface ChartFiboLines {
   fibo618: number
   fibo50: number
   fibo1000: number
+  dataInicio: Date
+  dataFim: Date
 }
 
 interface CustomProps {
@@ -72,37 +74,86 @@ export const ChartComponent = (props: CustomProps) => {
 
     const x = analysis[analysis.length - 1];
 
-    candleSeries.createPriceLine({
-      price: x.fibo0,
+    const lineSerieFibo0 = chart.addLineSeries({
       color: '#000',
       title: 'fibo0',
       lineStyle: 0,
+      priceLineVisible: false,
     })
-    
-    candleSeries.createPriceLine({
-      price: x.fibo382,
+
+    lineSerieFibo0.setData([
+      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo0 },
+      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo0 },
+    ])
+    const lineSerieFibo382 = chart.addLineSeries({
       color: '#000',
       title: 'fibo382',
+      lineStyle: 2,
+      priceLineVisible: false,
     })
-    
-    candleSeries.createPriceLine({
-      price: x.fibo618,
+
+    lineSerieFibo382.setData([
+      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo382 },
+      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo382 },
+    ])
+    const lineSerieFibo618 = chart.addLineSeries({
       color: '#000',
       title: 'fibo618',
+      lineStyle: 2,
+      priceLineVisible: false,
     })
-    
-    candleSeries.createPriceLine({
-      price: x.fibo50,
+
+    lineSerieFibo618.setData([
+      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo618 },
+      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo618 },
+    ])
+    const lineSerieFibo50 = chart.addLineSeries({
       color: '#000',
       title: 'fibo50',
+      lineStyle: 1,
+      priceLineVisible: false,
     })
-    
-    candleSeries.createPriceLine({
-      price: x.fibo1000,
+
+    lineSerieFibo50.setData([
+      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo50 },
+      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo50 },
+    ])
+    const lineSerieFibo1000 = chart.addLineSeries({
       color: '#000',
       title: 'fibo1000',
       lineStyle: 0,
+      priceLineVisible: false,
     })
+
+    lineSerieFibo1000.setData([
+      { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo1000 },
+      { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo1000 },
+    ])
+
+    // candleSeries.createPriceLine({
+    //   price: x.fibo382,
+    //   color: '#000',
+    //   title: 'fibo382',
+    // })
+
+    // candleSeries.createPriceLine({
+    //   price: x.fibo618,
+    //   color: '#000',
+    //   title: 'fibo618',
+    // })
+
+    // candleSeries.createPriceLine({
+    //   price: x.fibo50,
+    //   color: '#000',
+    //   title: 'fibo50',
+    // })
+
+    // candleSeries.createPriceLine({
+    //   price: x.fibo1000,
+    //   color: '#000',
+    //   title: 'fibo1000',
+    //   lineStyle: 0,
+    // })
 
     // for (let index = 0; index < analysis.length; index++) {
     //   const element = analysis[index];
