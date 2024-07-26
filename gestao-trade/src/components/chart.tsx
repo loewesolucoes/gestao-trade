@@ -29,21 +29,20 @@ interface CustomProps {
   className?: string,
   visibleFrom?: string,
   visibleTo?: string,
+  options: { showFibo: boolean, showMovements: boolean }
 }
 
 let chart: import('lightweight-charts').IChartApi;
 
 export const ChartComponent = (props: CustomProps) => {
-  const { data, analysis, visibleFrom, visibleTo, ...otherProps } = props;
+  const { data, analysis, visibleFrom, visibleTo, options, ...otherProps } = props;
 
   const chartContainerRef = useRef() as any;
 
   useEffect(() => {
     if (data == null) return;
 
-    createChartWithCandle();
-    setVisibleRange();
-    createFiboCharts();
+    reinitCharts();
 
     window.addEventListener('resize', handleResize);
 
@@ -53,6 +52,20 @@ export const ChartComponent = (props: CustomProps) => {
       chart.remove();
     };
   }, [data]);
+
+  useEffect(() => {
+    if (options.showFibo) createFiboCharts();
+    else reinitCharts();
+  }, [options]);
+
+  function reinitCharts() {
+    if (chart != null) {
+      chartContainerRef.current.innerHTML = "";
+    }
+
+    createChartWithCandle();
+    setVisibleRange();
+  }
 
   function handleResize() {
     chart.applyOptions({ width: chartContainerRef.current.clientWidth });

@@ -23,6 +23,8 @@ export default function () {
   const [acaoEscolhida, setAcaoEscolhida] = useState<string>();
   const [historico, setHistorico] = useState<ChartIntraday[]>();
   const [analysis, setAnalysis] = useState<any>();
+  const [showFibo, setShowFibo] = useState<boolean>(false);
+  const [showMovements, setShowMovements] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = `Início | ${process.env.REACT_APP_TITLE}`
@@ -79,7 +81,19 @@ export default function () {
   return (
     <Layout>
       <section className='container'>
-        <div className="configs">
+        <div className="stocks">
+          {acoes == null
+            ? <div className="alert alert-info">Carregando ações ativas...</div>
+            : (
+              acoes.length === 0
+                ? (<div className="alert alert-info">Nenhuma ação ativa...</div>)
+                : acoes.map(x => (
+                  <AcaoCard key={x.codigo} acao={x} isActive={x.codigo === acaoEscolhida} onClick={s => setAcaoEscolhida(s.codigo)} />
+                ))
+            )
+          }
+        </div>
+        <div className="configs my-3 gap-3">
           <div className="form-group">
             <label htmlFor="dataInicio" className="form-label">Data inicio:</label>
             <Input type="date" id="dataInicio" name="dataInicio" className="form-control" value={initialDate} onChange={value => setInitialDate(value)} />
@@ -88,22 +102,13 @@ export default function () {
             <label htmlFor="dataFim" className="form-label">Data fim:</label>
             <Input type="date" id="dataFim" name="dataFim" className="form-control" value={endDate} onChange={value => setEndDate(value)} />
           </div>
+          <button type="button" className="btn btn-secondary" onClick={() => setShowFibo(!showFibo)}>Mostrar Fibo</button>
+          <button type="button" className="btn btn-secondary" onClick={() => setShowMovements(!showMovements)}>Mostrar Movimentos</button>
         </div>
-        {acoes == null ? <div className="alert alert-info">Carregando ações ativas...</div>
-          : (
-            acoes.length === 0 ? (<div className="alert alert-info">Nenhuma ação ativa...</div>) : (
-              <div className="stocks">
-                {acoes.map(x => (
-                  <AcaoCard key={x.codigo} acao={x} isActive={x.codigo === acaoEscolhida} onClick={s => setAcaoEscolhida(s.codigo)} />
-                ))}
-              </div>
-            )
-          )
-        }
         {acaoEscolhida == null ? <div className="alert alert-warning">Escolha uma ação para analisar</div>
           : <>
             {historico == null ? <div className="alert alert-info">Carregando histórico...</div>
-              : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate} analysis={analysis}></ChartComponent>}
+              : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate} analysis={analysis} options={{ showFibo, showMovements }}></ChartComponent>}
             <section className="card analysis">
               <div className="card-header">Analise</div>
               <div className="card-body">
