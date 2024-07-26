@@ -93,7 +93,7 @@ export default function () {
             )
           }
         </div>
-        <div className="configs my-3 gap-3">
+        <div className="configs my-3 gap-3 d-flex flex-column flex-lg-row">
           <div className="form-group">
             <label htmlFor="dataInicio" className="form-label">Data inicio:</label>
             <Input type="date" id="dataInicio" name="dataInicio" className="form-control" value={initialDate} onChange={value => setInitialDate(value)} />
