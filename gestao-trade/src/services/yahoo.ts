@@ -9,6 +9,7 @@ export class YahooService extends WorkerService {
   }
 
   public async loadAll() {
+    NotificationUtil.send(`Inicio da integração do YAHOO.`);
     const startTime = Date.now();
     const response = await this.postMessageAndReceive(WorkersActions.LOAD_ALL)
 

@@ -7,6 +7,7 @@ import { useStorage } from '../../contexts/storage';
 import { IntegracaoHistoricoAcao, IntervaloHistoricoAcoes } from '../../repositories/historico-acoes';
 import { AcaoCard } from '../acoes/acao-card/acao-card';
 import { ReactComponent as ArrowClockWise } from "./arrow-clockwise.svg";
+import { NotificationUtil } from '../../utils/notification';
 
 export default function () {
   const { isLoadingIntegration } = useIntegration();
@@ -26,7 +27,7 @@ export default function () {
 }
 function CardsDaIntegracao() {
   const { loadAll, loadBrapi, loadYahoo } = useIntegration();
-  const { repository, isDbOk } = useStorage();
+  const { repository, isDbOk, refresh } = useStorage();
   const [isLoading, setIsLoading] = useState(true)
   const [acoesQuePrecisamAtualizar, setAcoesQuePrecisamAtualizar] = useState<IntegracaoHistoricoAcao[]>([])
 
@@ -37,8 +38,20 @@ function CardsDaIntegracao() {
   async function load() {
     setIsLoading(true);
     const result = await repository.historicoAcoes.acoesQuePrecisamAtualizar(IntervaloHistoricoAcoes.UM_DIA);
-
+    
     setAcoesQuePrecisamAtualizar(result);
+    setIsLoading(false);
+  }
+  
+  async function setAllAsInactive() {
+    setIsLoading(true);
+    
+    await repository.acoes.desabilitarTudo();
+
+    NotificationUtil.send('Desativado todas ações com sucesso.')
+    
+    await refresh();
+
     setIsLoading(false);
   }
 
@@ -80,8 +93,9 @@ function CardsDaIntegracao() {
         <h4 className="card-header">
           BRAPI
         </h4>
-        <div className="card-body">
+        <div className="card-body d-flex gap-3">
           <button type='button' className='btn btn-secondary' onClick={loadBrapi}><ArrowClockWise /> Integrar BRAPI</button>
+          <button type='button' className='btn btn-secondary' onClick={setAllAsInactive}>🔕 Marcar tudo como inativo</button>
         </div>
       </div>
     </div>

@@ -60,7 +60,6 @@ async function loadAllAndSave() {
     const acaoDoDB = acoesDict[acaoAtual.codigo];
     const acaoDoDBOrNew = acaoDoDB || {} as Acoes;
 
-    acaoDoDBOrNew.active = acaoAtual.active;
     acaoDoDBOrNew.codigo = acaoAtual.codigo;
     acaoDoDBOrNew.logo = acaoAtual.logo;
     acaoDoDBOrNew.nome = acaoAtual.nome;

@@ -79,4 +79,10 @@ export class AcoesRepository extends DefaultRepository {
 
     return parsed[0] || []
   }
+
+  public async desabilitarTudo() {
+    await this.db.exec('UPDATE acoes SET "active" = 0 WHERE 1 = 1;');
+
+    await this.persistDb();
+  }
 }

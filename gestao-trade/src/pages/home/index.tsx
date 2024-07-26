@@ -102,6 +102,8 @@ export default function () {
         }
         {acaoEscolhida == null ? <div className="alert alert-warning">Escolha uma ação para analisar</div>
           : <>
+            {historico == null ? <div className="alert alert-info">Carregando histórico...</div>
+              : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate} analysis={analysis}></ChartComponent>}
             <section className="card analysis">
               <div className="card-header">Analise</div>
               <div className="card-body">
@@ -112,8 +114,6 @@ export default function () {
                 }
               </div>
             </section>
-            {historico == null ? <div className="alert alert-info">Carregando histórico...</div>
-              : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate} analysis={analysis}></ChartComponent>}
           </>
         }
       </section>

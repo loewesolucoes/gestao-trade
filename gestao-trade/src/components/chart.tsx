@@ -2,6 +2,8 @@
 import { useEffect, useRef } from 'react';
 import { CrosshairMode, createChart } from 'lightweight-charts';
 import moment from 'moment';
+import { useEnv } from '../contexts/env';
+import { NotificationUtil } from '../utils/notification';
 
 export interface ChartIntraday {
   time: string,
@@ -37,10 +39,26 @@ export const ChartComponent = (props: CustomProps) => {
   const chartContainerRef = useRef() as any;
 
   useEffect(() => {
-    const handleResize = () => {
-      chart.applyOptions({ width: chartContainerRef.current.clientWidth });
-    };
+    if (data == null) return;
 
+    createChartWithCandle();
+    setVisibleRange();
+    createFiboCharts();
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+
+      chart.remove();
+    };
+  }, [data]);
+
+  function handleResize() {
+    chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+  };
+
+  function createChartWithCandle() {
     chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height: 500,
@@ -69,9 +87,9 @@ export const ChartComponent = (props: CustomProps) => {
     const candleSeries = chart.addCandlestickSeries({});
 
     candleSeries.setData(data);
+  }
 
-    setVisibleRange();
-
+  function createFiboCharts() {
     for (let index = 0; index < analysis.length; index++) {
       const x = analysis[index];
       const currentColor = getRandomColor();
@@ -81,95 +99,58 @@ export const ChartComponent = (props: CustomProps) => {
         lineStyle: 0,
         lastValueVisible: false,
         priceLineVisible: false,
-      })
+      });
 
       lineSerieFibo0.setData([
         { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo0 },
         { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo0 },
-      ])
+      ]);
       const lineSerieFibo382 = chart.addLineSeries({
         color: currentColor,
         lineStyle: 2,
         lastValueVisible: false,
         priceLineVisible: false,
-      })
+      });
 
       lineSerieFibo382.setData([
         { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo382 },
         { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo382 },
-      ])
+      ]);
       const lineSerieFibo618 = chart.addLineSeries({
         color: currentColor,
         lineStyle: 2,
         lastValueVisible: false,
         priceLineVisible: false,
-      })
+      });
 
       lineSerieFibo618.setData([
         { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo618 },
         { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo618 },
-      ])
+      ]);
       const lineSerieFibo50 = chart.addLineSeries({
         color: currentColor,
         lineStyle: 1,
         lastValueVisible: false,
         priceLineVisible: false,
-      })
+      });
 
       lineSerieFibo50.setData([
         { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo50 },
         { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo50 },
-      ])
+      ]);
       const lineSerieFibo1000 = chart.addLineSeries({
         color: currentColor,
         lineStyle: 0,
         lastValueVisible: false,
         priceLineVisible: false,
-      })
+      });
 
       lineSerieFibo1000.setData([
         { time: moment(x.dataInicio).format('YYYY-MM-DD'), value: x.fibo1000 },
         { time: moment(x.dataFim).format('YYYY-MM-DD'), value: x.fibo1000 },
-      ])
+      ]);
     }
-    // candleSeries.createPriceLine({
-    //   price: x.fibo382,
-    //   color: '#000',
-    //   title: 'fibo382',
-    // })
-
-    // candleSeries.createPriceLine({
-    //   price: x.fibo618,
-    //   color: '#000',
-    //   title: 'fibo618',
-    // })
-
-    // candleSeries.createPriceLine({
-    //   price: x.fibo50,
-    //   color: '#000',
-    //   title: 'fibo50',
-    // })
-
-    // candleSeries.createPriceLine({
-    //   price: x.fibo1000,
-    //   color: '#000',
-    //   title: 'fibo1000',
-    //   lineStyle: 0,
-    // })
-
-    // for (let index = 0; index < analysis.length; index++) {
-    //   const element = analysis[index];
-
-    // }
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-
-      chart.remove();
-    };
-  }, [data]);
+  }
 
   useEffect(() => {
     setVisibleRange();
