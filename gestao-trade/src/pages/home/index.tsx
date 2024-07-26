@@ -131,8 +131,10 @@ function filterAnalysis(analysis: any): any {
     analysis
       // .filter((x: any) => x.bateuAlvo1)
       .map((x: any) => {
-        x.movements = undefined;
-        return x;
+        return {
+          ...x,
+          movements: undefined
+        }
       })
     , null, 4);
 }

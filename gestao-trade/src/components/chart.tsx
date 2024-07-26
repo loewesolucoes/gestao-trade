@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from 'react';
-import { CrosshairMode, createChart } from 'lightweight-charts';
+import { CrosshairMode, LineStyle, createChart } from 'lightweight-charts';
 import moment from 'moment';
 import { useEnv } from '../contexts/env';
 import { NotificationUtil } from '../utils/notification';
@@ -21,6 +21,7 @@ export interface ChartFiboLines {
   fibo1000: number
   dataInicio: Date
   dataFim: Date
+  movements: any[]
 }
 
 interface CustomProps {
@@ -54,8 +55,11 @@ export const ChartComponent = (props: CustomProps) => {
   }, [data]);
 
   useEffect(() => {
+    reinitCharts();
+
     if (options.showFibo) createFiboCharts();
-    else reinitCharts();
+
+    if (options.showMovements) createMovementsCharts();
   }, [options]);
 
   function reinitCharts() {
@@ -102,6 +106,21 @@ export const ChartComponent = (props: CustomProps) => {
     candleSeries.setData(data);
   }
 
+  function createMovementsCharts() {
+    for (let index = 0; index < analysis.length; index++) {
+      const x = analysis[index];
+      const currentColor = getRandomColor();
+      const lineSerieFibo0 = chart.addLineSeries({
+        color: currentColor,
+        lineStyle: LineStyle.Dashed,
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      lineSerieFibo0.setData(x.movements.map(y => ({ time: moment(y.date).format('YYYY-MM-DD'), value: y.low?.plus(y.high?.minus(y.low).div(2))?.toNumber() })));
+    }
+  }
+
   function createFiboCharts() {
     for (let index = 0; index < analysis.length; index++) {
       const x = analysis[index];
@@ -109,7 +128,7 @@ export const ChartComponent = (props: CustomProps) => {
 
       const lineSerieFibo0 = chart.addLineSeries({
         color: currentColor,
-        lineStyle: 0,
+        lineStyle: LineStyle.Solid,
         lastValueVisible: false,
         priceLineVisible: false,
       });
@@ -120,7 +139,7 @@ export const ChartComponent = (props: CustomProps) => {
       ]);
       const lineSerieFibo382 = chart.addLineSeries({
         color: currentColor,
-        lineStyle: 2,
+        lineStyle: LineStyle.Dashed,
         lastValueVisible: false,
         priceLineVisible: false,
       });
@@ -131,7 +150,7 @@ export const ChartComponent = (props: CustomProps) => {
       ]);
       const lineSerieFibo618 = chart.addLineSeries({
         color: currentColor,
-        lineStyle: 2,
+        lineStyle: LineStyle.Dashed,
         lastValueVisible: false,
         priceLineVisible: false,
       });
@@ -142,7 +161,7 @@ export const ChartComponent = (props: CustomProps) => {
       ]);
       const lineSerieFibo50 = chart.addLineSeries({
         color: currentColor,
-        lineStyle: 1,
+        lineStyle: LineStyle.Dotted,
         lastValueVisible: false,
         priceLineVisible: false,
       });
@@ -153,7 +172,7 @@ export const ChartComponent = (props: CustomProps) => {
       ]);
       const lineSerieFibo1000 = chart.addLineSeries({
         color: currentColor,
-        lineStyle: 0,
+        lineStyle: LineStyle.Solid,
         lastValueVisible: false,
         priceLineVisible: false,
       });
