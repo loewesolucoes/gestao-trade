@@ -126,7 +126,7 @@ export default function () {
   );
 }
 
-function filterAnalysis(analysis: any): any {
+function filterAnalysis(analysis: any[]): any {
   return JSON.stringify(
     analysis
       // .filter((x: any) => x.bateuAlvo1)
@@ -135,6 +135,6 @@ function filterAnalysis(analysis: any): any {
           ...x,
           movements: undefined
         }
-      })
+      }).reverse()
     , null, 4);
 }

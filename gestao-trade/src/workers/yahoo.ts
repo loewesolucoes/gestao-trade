@@ -64,12 +64,13 @@ async function downloadAndSaveIfNeed(acaoIntegracao: IntegracaoHistoricoAcao) {
 
     if (records.length > 0) {
       console.debug(`yahoo:${codigoAcao} saveAll start`);
+      await repository.deleteLastDayRecords(codigoAcao, periodStart.toDate());
       await repository.saveAll(TableNames.HISTORICO_ACOES, records);
 
       console.debug(`yahoo:${codigoAcao} saveAll ok`);
     } else console.debug(`not needed to save yahoo for: ${codigoAcao}`);
   } catch (ex) {
-    console.error('Yahoo status error', acaoIntegracao);
+    console.error('Yahoo status error', acaoIntegracao, ex);
 
     NotificationUtil.send(`Erro ao integrar com o serviço yahoo => ${codigoAcao}`);
   }

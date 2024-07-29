@@ -105,4 +105,29 @@ export class HistoricoAcoesRepository extends DefaultRepository {
       return acaoIntegracao
     }).filter(x => x.codigoAcao != null)
   }
+
+  public async deleteLastDayRecords(codigo: string, periodStart: Date) {
+    const query = `
+      delete from "historico_acoes" 
+      where "codigo" = $codigo 
+      and "createdDate" >= $createdDate
+    `;
+
+    await this.db.exec(query, { $codigo: codigo, $createdDate: periodStart });
+    await this.persistDb();
+  }
+
+  public async removerUltimoDiaDoHistorico() {
+    const query = `
+      DELETE FROM historico_acoes
+      WHERE (codigo, createdDate) IN (
+          SELECT codigo, MAX(createdDate)
+          FROM historico_acoes
+          GROUP BY codigo
+      );
+    `;
+
+    await this.db.exec(query, {});
+    await this.persistDb();
+  }
 }

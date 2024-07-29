@@ -38,18 +38,30 @@ function CardsDaIntegracao() {
   async function load() {
     setIsLoading(true);
     const result = await repository.historicoAcoes.acoesQuePrecisamAtualizar(IntervaloHistoricoAcoes.UM_DIA);
-    
+
     setAcoesQuePrecisamAtualizar(result);
     setIsLoading(false);
   }
-  
+
   async function setAllAsInactive() {
     setIsLoading(true);
-    
+
     await repository.acoes.desabilitarTudo();
 
     NotificationUtil.send('Desativado todas ações com sucesso.')
-    
+
+    await refresh();
+
+    setIsLoading(false);
+  }
+
+  async function removerUltimoDiaDoHistorico() {
+    setIsLoading(true);
+
+    await repository.historicoAcoes.removerUltimoDiaDoHistorico();
+
+    NotificationUtil.send('Removido ultimo dia do histórico sucesso.')
+
     await refresh();
 
     setIsLoading(false);
@@ -75,6 +87,7 @@ function CardsDaIntegracao() {
           <button type='button' className='btn btn-secondary' onClick={loadYahoo}><ArrowClockWise /> Integrar Yahoo</button>
         </h4>
         <div className="card-body">
+          <button type='button' className='btn btn-secondary mb-3' onClick={removerUltimoDiaDoHistorico}>❌ Remover ultimo dia do histórico</button>
           <h5 className="card-title">Ações que precisam integrar</h5>
           {acoesQuePrecisamAtualizar == null ? <div className="alert alert-info">Carregando ações ativas...</div>
             : (
