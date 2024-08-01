@@ -15,7 +15,33 @@ export interface ChartIntraday {
 
 export interface Analise {
   fibos: ChartFiboLines[]
+  toposEFundos: ToposEFundos[]
 }
+
+export interface ToposEFundos {
+  index: number;
+  order: number;
+  date: Date;
+  data: ToposEFundosData;
+  type: string;
+}
+
+export interface ToposEFundosData {
+  id: number;
+  codigo: string;
+  date: Date;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  adjustedClose: number;
+  volume: number;
+  intervalo: number;
+  createdDate: Date;
+  updatedDate: null;
+  type: string;
+}
+
 
 export interface ChartFiboLines {
   fibo0: number
@@ -34,7 +60,7 @@ interface CustomProps {
   className?: string,
   visibleFrom?: string,
   visibleTo?: string,
-  options: { showFibo: boolean, showMovements: boolean }
+  options: { showFibo: boolean, showMovements: boolean, showToposEFundos: boolean }
 }
 
 let chart: import('lightweight-charts').IChartApi;
@@ -59,27 +85,31 @@ export const ChartComponent = (props: CustomProps) => {
   }, [data]);
 
   useEffect(() => {
-    reinitCharts();
+    const candleSeries = reinitCharts();
 
     if (options.showFibo) createFiboCharts();
 
     if (options.showMovements) createMovementsCharts();
+
+    if (options.showToposEFundos) createToposEFundos(candleSeries);
   }, [options]);
 
-  function reinitCharts() {
+  function reinitCharts(): import('lightweight-charts').ISeriesApi<"Candlestick", import('lightweight-charts').Time> {
     if (chart != null) {
       chartContainerRef.current.innerHTML = "";
     }
 
-    createChartWithCandle();
+    const candleSeries = createChartWithCandle();
     setVisibleRange();
+
+    return candleSeries;
   }
 
   function handleResize() {
     chart.applyOptions({ width: chartContainerRef.current.clientWidth });
   };
 
-  function createChartWithCandle() {
+  function createChartWithCandle(): import('lightweight-charts').ISeriesApi<"Candlestick", import('lightweight-charts').Time> {
     chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height: 500,
@@ -108,10 +138,35 @@ export const ChartComponent = (props: CustomProps) => {
     const candleSeries = chart.addCandlestickSeries({});
 
     candleSeries.setData(data);
+
+    return candleSeries;
+  }
+
+  function createToposEFundos(candleSeries: import('lightweight-charts').ISeriesApi<"Candlestick", import('lightweight-charts').Time>) {
+    const { toposEFundos } = analysis
+    const markers: import('lightweight-charts').SeriesMarker<import('lightweight-charts').Time>[] = [];
+    const currentColor = getRandomColor();
+
+    for (let index = 0; index < toposEFundos.length; index++) {
+      const element = toposEFundos[index];
+
+      const isTopo = element.type === 'TOPO';
+
+      markers.push({
+        time: moment(element.date).format('YYYY-MM-DD'),
+        position: isTopo ? 'aboveBar' : 'belowBar',
+        shape: isTopo ? 'arrowDown' : 'arrowUp',
+        color: currentColor,
+        text: isTopo ? 'T' : 'F',
+      })
+    }
+
+    candleSeries.setMarkers(markers);
   }
 
   function createMovementsCharts() {
     const { fibos } = analysis
+
     for (let index = 0; index < fibos.length; index++) {
       const x = analysis[index];
       const currentColor = getRandomColor();

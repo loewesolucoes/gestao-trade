@@ -5,12 +5,13 @@ import { useEffect, useState } from 'react';
 import { Acoes } from '../../repositories/acoes';
 import { useStorage } from '../../contexts/storage';
 import { AcaoCard } from '../acoes/acao-card/acao-card';
-import { ChartComponent, ChartIntraday } from '../../components/chart';
+import { Analise, ChartComponent, ChartIntraday } from '../../components/chart';
 import { NotificationUtil } from '../../utils/notification';
 import moment from 'moment';
 import { analysisService } from '../../services/analysis';
 import { Input } from '../../components/input';
 import { useEnv } from '../../contexts/env';
+import { NumberUtil } from '../../utils/number';
 
 export default function () {
   const { isMobile } = useEnv();
@@ -22,9 +23,10 @@ export default function () {
   const [acoes, setAcoes] = useState<Acoes[]>();
   const [acaoEscolhida, setAcaoEscolhida] = useState<string>();
   const [historico, setHistorico] = useState<ChartIntraday[]>();
-  const [analysis, setAnalysis] = useState<any>();
+  const [analysis, setAnalysis] = useState<Analise>();
   const [showFibo, setShowFibo] = useState<boolean>(false);
   const [showMovements, setShowMovements] = useState<boolean>(false);
+  const [showToposEFundos, setShowToposEFundos] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = `Início | ${process.env.REACT_APP_TITLE}`
@@ -64,21 +66,13 @@ export default function () {
     const analysis = analysisService.run(historico, initialDate, endDate);
 
     setAnalysis({
+      ...analysis,
+      toposEFundos: analysis.toposEFundos.map(NumberUtil.bigNumberToNumber),
       fibos: analysis
         .fibos
         // @ts-ignore
         .filter(x => x.movementType !== 'UNCOMPLETED')
-        .map(x => ({
-          ...x,
-          alvo1: x.alvo1?.toNumber(),
-          alvo2: x.alvo2?.toNumber(),
-          alvo3: x.alvo3?.toNumber(),
-          fibo0: x.fibo0?.toNumber(),
-          fibo382: x.fibo382?.toNumber(),
-          fibo618: x.fibo618?.toNumber(),
-          fibo50: x.fibo50?.toNumber(),
-          fibo1000: x.fibo1000?.toNumber(),
-        }))
+        .map(NumberUtil.bigNumberToNumber)
     });
   }
 
@@ -106,6 +100,7 @@ export default function () {
             <label htmlFor="dataFim" className="form-label">Data fim:</label>
             <Input type="date" id="dataFim" name="dataFim" className="form-control" value={endDate} onChange={value => setEndDate(value)} />
           </div>
+          <button type="button" className="btn btn-secondary" onClick={() => setShowToposEFundos(!showToposEFundos)}>Mostrar Topos e Fundos</button>
           <button type="button" className="btn btn-secondary" onClick={() => setShowFibo(!showFibo)}>Mostrar Fibo</button>
           <button type="button" className="btn btn-secondary" onClick={() => setShowMovements(!showMovements)}>Mostrar Movimentos</button>
         </div>
@@ -113,7 +108,7 @@ export default function () {
           : <>
             {historico?.length === 0 && <div className="alert alert-info">Nenhum historico encontrado, realize as integrações para carregar o historico das ações.</div>}
             {historico == null ? <div className="alert alert-info">Carregando histórico...</div>
-              : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate} analysis={analysis} options={{ showFibo, showMovements }}></ChartComponent>}
+              : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate} analysis={analysis || {} as any} options={{ showFibo, showMovements, showToposEFundos }}></ChartComponent>}
             <section className="card analysis">
               <div className="card-header">Analise</div>
               <div className="card-body">
