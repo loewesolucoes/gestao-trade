@@ -13,6 +13,10 @@ export interface ChartIntraday {
   low?: number,
 }
 
+export interface Analise {
+  fibos: ChartFiboLines[]
+}
+
 export interface ChartFiboLines {
   fibo0: number
   fibo382: number
@@ -26,7 +30,7 @@ export interface ChartFiboLines {
 
 interface CustomProps {
   data: ChartIntraday[],
-  analysis: ChartFiboLines[],
+  analysis: Analise,
   className?: string,
   visibleFrom?: string,
   visibleTo?: string,
@@ -107,7 +111,8 @@ export const ChartComponent = (props: CustomProps) => {
   }
 
   function createMovementsCharts() {
-    for (let index = 0; index < analysis.length; index++) {
+    const { fibos } = analysis
+    for (let index = 0; index < fibos.length; index++) {
       const x = analysis[index];
       const currentColor = getRandomColor();
       const lineSerieFibo0 = chart.addLineSeries({
@@ -122,7 +127,9 @@ export const ChartComponent = (props: CustomProps) => {
   }
 
   function createFiboCharts() {
-    for (let index = 0; index < analysis.length; index++) {
+    const { fibos } = analysis
+
+    for (let index = 0; index < fibos.length; index++) {
       const x = analysis[index];
       const currentColor = getRandomColor();
 

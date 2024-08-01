@@ -18,6 +18,12 @@ export enum PivosType {
   BAIXA = "BAIXA"
 }
 
+interface Analise {
+  fibos: FiboEAlvos[],
+  movements: FiboEAlvos[],
+  toposEFundos: any[],
+}
+
 interface FiboEAlvos {
   movements: HistoricoAcoes[]
   fibo0?: BigNumber
@@ -45,8 +51,9 @@ interface ExtremosData extends HistoricoAcoes {
 }
 
 class AnalysisService {
-  public run(historyOriginal: HistoricoAcoes[], initialDate: string, endDate: string): FiboEAlvos[] {
-    if (historyOriginal.length === 0) return [];
+  public run(historyOriginal: HistoricoAcoes[], initialDate: string, endDate: string): Analise {
+    if (historyOriginal.length === 0) return null as any;
+
     const filteredHistory = historyOriginal.filter(x => moment(x.date).isBetween(initialDate, endDate));
 
     const toposEFundos = this.toposEFundos(filteredHistory, 2);
@@ -55,7 +62,11 @@ class AnalysisService {
     const movementsAltaWithFibo = this.criarFiboEAlvos(movementsAlta);
     const movementsBaixaWithFibo = this.criarFiboEAlvos(movementsBaixa);
 
-    return movementsAltaWithFibo.concat(movementsBaixaWithFibo);
+    return {
+      fibos: movementsAltaWithFibo.concat(movementsBaixaWithFibo),
+      movements: movementsAlta.concat(movementsBaixa),
+      toposEFundos,
+    };
   }
 
   private criarFiboEAlvos(toposEFundos: any[]) {
