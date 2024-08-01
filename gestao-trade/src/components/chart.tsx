@@ -189,7 +189,7 @@ export const ChartComponent = (props: CustomProps) => {
   }, [visibleFrom, visibleTo]);
 
   function setVisibleRange() {
-    if (visibleFrom == null || visibleTo == null)
+    if (visibleFrom == null || visibleTo == null || data?.length === 0)
       chart.timeScale().fitContent();
     else // @ts-ignore
       chart.timeScale().setVisibleRange({ from: moment(visibleFrom).unix(), to: moment(visibleTo).unix() });

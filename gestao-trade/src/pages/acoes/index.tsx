@@ -124,19 +124,24 @@ export default function () {
             )}
           </div>
         </div>
-        <div className="cards">
-          {acoes.map(s => (
-            <AcaoCard key={s.codigo} acao={s} isActive={!!acoesEscolhidas[s.codigo]} onClick={MarkStock} />
-          ))}
-        </div>
-        <div className="pagination-section">
-          <PaginationControl page={page} total={total} limit={take} ellipsis={10} onChangePage={page => setPage(page)}></PaginationControl>
-          <select className="form-select" value={take} onChange={e => setTake(Number(e?.target?.value) || 20)}>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
+        {!isLoadingMark && (
+          <>
+            {acoes.length === 0 ? <div className='alert alert-info'>Nenhuma ação encontrada, realize as integrações para carregar as ações.</div> : null}
+            <div className="cards">
+              {acoes.map(s => (
+                <AcaoCard key={s.codigo} acao={s} isActive={!!acoesEscolhidas[s.codigo]} onClick={MarkStock} />
+              ))}
+            </div>
+            <div className="pagination-section">
+              <PaginationControl page={page} total={total} limit={take} ellipsis={10} onChangePage={page => setPage(page)}></PaginationControl>
+              <select className="form-select" value={take} onChange={e => setTake(Number(e?.target?.value) || 20)}>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </>
+        )}
       </section>
     </Layout>
   );

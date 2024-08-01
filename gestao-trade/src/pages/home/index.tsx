@@ -107,6 +107,7 @@ export default function () {
         </div>
         {acaoEscolhida == null ? <div className="alert alert-warning">Escolha uma ação para analisar</div>
           : <>
+            {historico?.length === 0 && <div className="alert alert-info">Nenhum historico encontrado, realize as integrações para carregar o historico das ações.</div>}
             {historico == null ? <div className="alert alert-info">Carregando histórico...</div>
               : <ChartComponent className="chart" data={historico as any} visibleFrom={initialDate} visibleTo={endDate} analysis={analysis} options={{ showFibo, showMovements }}></ChartComponent>}
             <section className="card analysis">
